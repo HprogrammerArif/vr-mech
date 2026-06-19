@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "GNynpHCWnHPvpMmPv52m_"
+uri = "file://README.md"
+type = "text"
+title = "Developer Reference — README.md"

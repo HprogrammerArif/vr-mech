@@ -1,0 +1,52 @@
+CAREER CITY WORLD DESIGN:
+Make the platform feel like a large 3D career city, not a flat app. The user enters a central Career City hub with roads, sidewalks, plazas, signs, buildings, and career districts.
+
+Each career category should have its own corridor/district. Engineering must have a detailed Engineering Corridor with multiple buildings, including:
+- Civil Engineering Building
+- Mechanical Engineering Building
+- Electrical Engineering Building
+- Software/Computer Engineering Building
+- Chemical Engineering Building
+- Aerospace Engineering Building
+- Environmental Engineering Building
+- Biomedical Engineering Building
+- Construction/Infrastructure Zone
+
+Each building should contain hands-on 3D simulations tied to that specific field. Users should enter buildings and immediately perform interactive career tasks, not answer traditional quizzes.
+
+CAREER ADVICE NPCs:
+Add other people walking around the city who can give career advice. These NPCs should include:
+- Professionals
+- Mentors
+- Students
+- Recruiters
+- Counselors
+- Alumni-style guides
+
+Users can walk up to them and ask questions about careers, skills, education paths, daily work, challenges, salaries, internships, and next steps. NPCs should use AI-generated dialogue and respond naturally.
+
+MULTIPLAYER / SOCIAL SIMULATION MODE:
+Make the platform accessible for users to complete simulations together online.
+
+Users should be able to:
+- Join the same 3D career city
+- See other users as avatars
+- Walk around together
+- Enter simulations together
+- Collaborate on tasks
+- Talk through voice or text chat
+- Invite friends/classmates into the same simulation
+- Work as a team during certain scenarios
+
+Examples:
+- Engineering students collaborate to design and test a bridge
+- Healthcare users work together in a hospital emergency scenario
+- Business users pitch together in a startup boardroom
+- Legal users roleplay attorney, witness, and jury roles
+- Trades users troubleshoot a home repair scenario together
+
+The world should support both:
+- Solo simulation mode
+- Multiplayer simulation mode
+
+The experience should still keep users inside the 3D/VR world the entire time. Menus should appear only as in-world panels, floating holograms, city maps, building directories, or side HUD elements.

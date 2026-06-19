@@ -1,0 +1,55 @@
+3.8 AD ROTATION SYSTEM (15-SECOND CYCLE)
+
+All digital ad surfaces (billboards, plaza displays, building-side ads, 
+bus stop ads, kiosks) rotate creative every 15 seconds.
+
+Rotation behavior:
+- Each surface displays one ad for 15 seconds, then transitions to the 
+  next ad in its rotation queue
+- Smooth transition effect between ads (fade, slide, or flip — choose 
+  per surface type for variety)
+- Transitions take ~0.5 seconds; full ad visible for 14.5 seconds
+- Multiple ads per surface supported (queue of 4-12 ads typical)
+- Rotation continues whether or not players are looking — when a player 
+  approaches, they see whichever ad is currently in the cycle
+- Ads sync across all players on the same surface (everyone sees the 
+  same ad at the same time — creates shared experience)
+
+Server-side rotation logic:
+- Master clock controls all ad surfaces globally
+- Each surface has an independent rotation queue but shares the 15-second tick
+- Ad rotations logged for impression tracking (each cycle = 1 impression 
+  if player is within viewing distance and the ad is in their viewport)
+- Different surfaces show different ads at the same time (city feels 
+  varied, not synchronized)
+
+Targeting within rotation:
+- Rotation queues can be customized per district (Trades District 
+  surfaces show trade-relevant ads more frequently)
+- Time-of-day targeting (morning ads vs. afternoon ads)
+- Audience-tier targeting (different ads for different grade levels 
+  if appropriate)
+- Premium advertisers can purchase guaranteed slot frequency 
+  (e.g., "shown every 60 seconds" = 1 of every 4 rotations)
+
+Static surfaces (non-rotating):
+- Bench ads, small print ads, and "permanent sponsorship" placements 
+  remain static (no rotation)
+- District-naming sponsorships are static (e.g., "Trades District 
+  presented by [Sponsor]" doesn't rotate)
+- Only digital/animated surfaces rotate on the 15-second cycle
+
+Performance considerations:
+- Pre-load next 2 ads in queue to avoid loading delay during transition
+- Cache ad creative in browser memory for active session
+- Limit simultaneous animated ad transitions in viewport to maintain 
+  frame rate
+- Lower-priority ad surfaces (far from player) can pause rotation 
+  to save resources
+
+Impression analytics:
+- Track which ad was on which surface during each 15-second window
+- Track player viewport overlap with ad surface (was ad actually visible?)
+- Distance from player to surface (closer = higher quality impression)
+- Click-through events tied to specific ad creative + surface + timestamp
+- Advertiser dashboard shows per-creative performance, not just per-campaign

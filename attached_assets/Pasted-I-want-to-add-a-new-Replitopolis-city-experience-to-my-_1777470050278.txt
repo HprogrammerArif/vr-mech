@@ -1,0 +1,235 @@
+I want to add a new Replitopolis city experience to my existing app WITHOUT breaking, deleting, or replacing what already works.
+
+Before making changes:
+1. Review the current project structure.
+2. Identify the existing routes, components, pages, database models, authentication, styling, and simulation system.
+3. Do not remove or overwrite existing features.
+4. Build Replitopolis as a new modular layer that connects to the existing simulation content.
+
+Goal:
+Create a top-down, futuristic neon, game-like city called Replitopolis for 1WayMirror. This city should become an interactive navigation hub where users can explore career districts, enter buildings, meet AI career mentor NPCs, join LiveWorld with friends, and launch existing career simulations.
+
+Important:
+Do not rebuild the whole app from scratch. Preserve the current app and add this as a new route/page.
+
+Suggested route:
+- /replitopolis
+or
+- /career-city
+
+Core design:
+- Top-down/isometric futuristic neon city
+- Walkable, not too wide or overwhelming
+- Skyscrapers, roads, sidewalks, crosswalks, cars, stop signs, streetlights, plazas, people/NPCs
+- A central Career Hub
+- Districts grouped by career category
+- A mini-map so users can find buildings
+- A bulletin/to-do board recommending careers and simulations the user has not completed yet
+- Buildings should be clickable
+- Users should also be able to “walk” into buildings through an avatar movement system if feasible
+
+Districts and buildings:
+
+Engineering District:
+- Civil Engineering Lab
+- Mechanical Design Studio
+- Electrical Systems Center
+- Robotics Workshop
+- Aerospace Hangar
+- Biomedical Engineering Lab
+- Environmental Engineering Facility
+- Construction Planning Office
+
+Technology District:
+- AI Innovation Lab
+- Cybersecurity Operations Center
+- Software Engineering Studio
+- Data Analytics Room
+- Cloud Infrastructure Center
+- Quantum Computing Lab
+- IT Help Desk
+- Product Design Studio
+
+Business District:
+- Marketing Agency
+- Finance & Investing Office
+- Accounting Firm
+- Entrepreneurship Studio
+- Management Strategy Room
+- Supply Chain Command Center
+- Sales & Negotiation Lab
+- Real Estate Development Office
+
+Healthcare District:
+- Hospital Simulation Center
+- Nursing Floor
+- Pharmacy Counter
+- Physical Therapy Clinic
+- Dental Office
+- Veterinary Clinic
+- Radiology Imaging Room
+- Public Health Command Center
+
+Trades District:
+- Electrician Training House
+- HVAC Systems Building
+- Plumbing Workshop
+- Welding Bay
+- Carpentry Shop
+- Automotive Garage
+- Solar Installation Roof
+- Construction Equipment Yard
+
+Law & Public Service District:
+- Courtroom
+- Police Training Center
+- City Planning Office
+- Public Policy Room
+- Emergency Response Center
+- Social Work Office
+
+Exploratory District:
+- Career Match Center
+- AI Career Counselor Office
+- Expert Interview Theater
+- Shadowing Opportunity Center
+- Student Dashboard Center
+- Parent Resource Center
+
+Entrepreneurship District:
+- Startup Studio
+- Pitch Room
+- Product Design Lab
+- Customer Discovery Center
+- Funding & Investor Office
+- Business Model Workshop
+
+LiveWorld District:
+- LiveWorld Plaza
+- Friend Meet-Up Lounge
+- Group Simulation Arena
+- Events Arena
+- Safe Chat Zone
+
+Interactions:
+1. Clicking a building opens a panel with:
+   - building name
+   - career/topic description
+   - available simulations
+   - difficulty level
+   - estimated time
+   - “Start Simulation” button
+   - “Invite Friend” button
+   - “Talk to Mentor” button
+
+2. Starting a simulation should connect to the simulations already built in the app.
+   - Do not create a separate duplicate simulation system unless necessary.
+   - Reuse the existing simulation routes, data, and components.
+   - If existing simulations are stored in a database, map buildings to simulation IDs.
+   - If existing simulations are hardcoded, create a clean mapping file that links city buildings to current simulations.
+
+3. Add NPC career mentors throughout the city.
+   - Users can randomly come across NPCs.
+   - NPCs represent different career backgrounds.
+   - Clicking an NPC opens a chat-style mentor panel.
+   - NPCs can explain their career, recommend a simulation, and answer basic career questions.
+   - Example NPCs: AI Engineer, Nurse Manager, Electrician, Founder, Attorney, Civil Engineer, Social Worker, Data Analyst.
+
+4. Add LiveWorld mode.
+   - Users can choose solo mode or LiveWorld mode.
+   - In LiveWorld, users can meet friends or other users.
+   - When two users chat, the first prompt should ask:
+     - Name
+     - Career interest
+   - Show this context above the chat so users understand who they are talking to.
+   - Add a type bar below the chat.
+   - Users can invite each other into team simulations.
+   - Build this safely with a placeholder/mock multiplayer layer first if real-time multiplayer is not ready.
+
+5. Add team simulations.
+   - Allow two users to join the same simulation room.
+   - They can complete a simulation together.
+   - One user can invite the other.
+   - Track completion for both users if possible.
+
+6. Add a Career Bulletin Board.
+   - Shows to-do list:
+     - Explore a new district
+     - Complete one simulation
+     - Talk to two career mentors
+     - Try a career you have not explored
+     - Join LiveWorld
+     - Complete a team simulation
+   - Prioritize simulations the user has not completed.
+   - Recommend neglected categories so students explore broadly.
+
+7. Add progress systems:
+   - XP
+   - Badges
+   - Career Passport
+   - Simulations completed
+   - Districts explored
+   - Favorite careers
+   - Recommended next steps
+
+Technical requirements:
+- Preserve the existing app.
+- Add Replitopolis as isolated components.
+- Use reusable data structures for districts, buildings, NPCs, quests, and map locations.
+- Use feature flags if helpful.
+- Avoid risky database migrations unless needed.
+- If database changes are needed, create additive-only fields/tables.
+- Do not delete or rename existing data.
+- Do not break existing simulation pages.
+- Make the city responsive, but prioritize desktop experience first.
+- Use mock data first where needed, then connect to real data after the UI works.
+
+Suggested architecture:
+- /components/replitopolis/CityMap
+- /components/replitopolis/District
+- /components/replitopolis/Building
+- /components/replitopolis/NPCMentor
+- /components/replitopolis/MiniMap
+- /components/replitopolis/CareerBulletin
+- /components/replitopolis/LiveWorldPanel
+- /components/replitopolis/BuildingDetailPanel
+- /components/replitopolis/CareerPassport
+- /data/replitopolisDistricts
+- /data/buildingSimulationMap
+- /data/npcMentors
+- /data/careerQuests
+
+Visual style:
+- Futuristic neon city
+- Dark navy background
+- Blue, purple, gold, red, teal district lighting
+- Glowing building labels
+- Hover animations
+- Smooth camera movement
+- Clickable buildings
+- Top-down/isometric view
+- UI panels on the sides
+- Mini-map in the corner
+- Bottom navigation bar
+
+Do this in phases:
+
+Phase 1:
+Create the Replitopolis route, city layout, districts, buildings, map, and clickable building panels using mock data.
+
+Phase 2:
+Connect buildings to existing simulations.
+
+Phase 3:
+Add NPC mentor chat panels.
+
+Phase 4:
+Add Career Bulletin Board, XP, badges, and Career Passport.
+
+Phase 5:
+Add LiveWorld friend/chat/team simulation structure.
+
+Phase 6:
+Polish visuals, animations, responsiveness, and performance.
+
+Start with Phase 1 only. Do not change existing pages unless required for navigation. After Phase 1 works, explain what files were added or changed before moving to Phase 2.

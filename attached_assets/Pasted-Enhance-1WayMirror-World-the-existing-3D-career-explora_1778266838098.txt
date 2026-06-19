@@ -1,0 +1,329 @@
+Enhance 1WayMirror World, the existing 3D career exploration platform for 
+7th-12th grade students. The current state is functional but static. 
+Add the following features to make the world more interactive, realistic, 
+and engaging while maintaining the low-poly visual style and the existing 
+safety-monitored chat system.
+
+=== PRIORITY 1: AMBIENT LIFE & ATMOSPHERE ===
+
+1.1 NPC POPULATION
+- Add 15-25 ambient NPCs walking through the city
+- NPCs follow simple paths between districts (waypoint navigation)
+- Different NPC styles per district:
+  * Trades District: workers in hard hats, tool belts
+  * Science District: lab coats, clipboards
+  * Healthcare District: scrubs, stethoscope models
+  * Tech District: hoodies, laptop bags
+  * Arts District: artistic outfits, sketchbooks
+- NPCs play idle animations when paused (looking around, checking phone, 
+  waving, drinking coffee)
+- Click on an NPC to get a brief career fact or "Day in the Life" tooltip
+- NPCs respect player space (move around player rather than through)
+
+1.2 DYNAMIC ENVIRONMENT
+- Day/night cycle (real-time or accelerated 20-minute cycle)
+- Sun position affects lighting and shadows
+- Street lamps turn on at dusk
+- Building windows light up at night
+- Distant ambient sounds: city hum, light traffic, occasional birds
+- Subtle particle effects: leaves drifting, wind gusts moving trees
+- Animated 1WayMirror World banners (subtle wave/sway)
+- Flag movement on poles
+- Fountains in plazas with animated water
+
+1.3 WEATHER VARIATION (OPTIONAL, LOW PRIORITY)
+- Light rain effect occasionally (with sound)
+- Snow in winter months
+- Sunny default
+
+=== PRIORITY 2: INTERACTIVE BUILDINGS ===
+
+2.1 BUILDING DETAILING
+Replace placeholder boxes with detailed buildings featuring:
+- Windows (some lit, some dark)
+- Doors with district-appropriate styling
+- Roof details (chimneys, antennas, signs)
+- District-themed architecture:
+  * Trades: warehouse-style, exposed beams, crane silhouettes
+  * Science: modern glass, tall research towers
+  * Healthcare: hospital-cross signage, clean white architecture  
+  * Tech: sleek minimalist, holographic-style signs
+  * Business: skyscraper-style, corporate logos
+  * Arts: colorful, irregular shapes, mural exteriors
+  * Education: classical columns, clock tower
+
+2.2 HOVER INTERACTIONS
+- Buildings glow with colored outline when player approaches (within 5m)
+- Floating UI prompt appears: "Press E to Enter [Building Name]"
+- Building name and career category shown above building (always visible 
+  but subtle)
+- Distance indicator on minimap
+
+2.3 INTERIOR SPACES
+Each major building has an interior:
+- Smooth transition (fade or door animation)
+- Themed interior matching the career
+- Interactive objects inside (computer for tech, microscope for science, 
+  blueprints for trades)
+- NPC career mentor inside who can chat with student
+- "Try the Career" mini-experience (simple interactive task)
+- Exit clearly marked
+
+=== PRIORITY 3: ADVERTISING & SPONSORSHIP INTEGRATION ===
+
+The world should support multiple advertising surfaces as a monetization 
+channel. Build out 1WayMirror World as a "real city" with ad space that 
+companies, colleges, trade schools, and career programs can purchase. 
+Existing 1WayMirror branded billboards remain — additional ad surfaces 
+should be added throughout the world.
+
+3.1 BILLBOARD NETWORK
+Multiple billboard types throughout the city:
+- Large highway-style billboards at city entrances (premium tier)
+- Standard plaza billboards (currently exist with 1WayMirror branding — 
+  expand network)
+- Building-side wall ads (large surface area on tall buildings)
+- Bus stop / transit shelter ads (eye-level, high traffic)
+- Bench advertising (small format, high frequency)
+- Stadium/arena perimeter ads (around event spaces)
+- Animated digital displays in plazas (rotating ads, premium pricing)
+
+3.2 IN-WORLD SPONSORSHIP OPPORTUNITIES
+Beyond traditional billboards, integrate sponsorship into the experience:
+- Sponsored buildings: "Tech District presented by [Sponsor]"
+- Career booth sponsorships: a company sponsors the entire experience for 
+  their industry (e.g., "Nursing Career Path sponsored by [Hospital System]")
+- Branded NPCs: industry mentor NPCs can wear sponsor logos appropriately 
+  (e.g., apprenticeship program rep wears their union/trade school colors)
+- Sponsored events: career fairs, AMAs, scholarships announced via 
+  in-world banners
+- Branded objects: tools, books, equipment in interior spaces can carry 
+  sponsor logos (subtle product placement, never feels forced)
+- Scholarship kiosks: sponsored by colleges/foundations, lead to real 
+  application info
+
+3.3 AD CONTENT MANAGEMENT SYSTEM
+Build an admin-side ad management dashboard:
+- Upload ad creative (images, optionally short video)
+- Assign to specific surface types (billboard, wall, kiosk, etc.)
+- Set rotation schedule (multiple ads cycle on same surface)
+- Geographic/district targeting (Trades District ads in Trades only)
+- Audience targeting (grade level, career interest tags)
+- Campaign duration and pacing controls
+- Click-through tracking (ads can be "interactive" — students click for 
+  more info, opens info panel in-world, NEVER navigates outside platform)
+- Impression and engagement analytics dashboard for advertisers
+- Ad approval workflow (admin reviews before going live)
+
+3.4 AD CONTENT POLICIES (CRITICAL FOR MINOR PLATFORM)
+Strict rules enforced by admin review and AI content scanning:
+- ONLY education, career, scholarship, college, trade school, military, 
+  apprenticeship, and youth-appropriate brand advertising
+- NO advertising for: alcohol, tobacco, vaping, gambling, dating apps, 
+  weight loss products, financial products (loans, credit cards), 
+  political content, adult content, or any age-restricted product
+- NO ads featuring real adult celebrities directed at students
+- All ad creative reviewed by AI moderation pipeline + human admin 
+  before going live
+- All ads must include clear sponsor identification (no disguised content)
+- Ads cannot collect personal information from students directly — 
+  click-through goes to information panels, parent-notified contact 
+  request, or general public information only
+- COPPA-compliant: no behavioral tracking of users under 13 for ad targeting
+
+3.5 IDEAL ADVERTISER TYPES (PITCH TARGETS)
+The platform's natural advertisers include:
+- Trade schools and apprenticeship programs
+- Community colleges and universities
+- Military recruiters (with appropriate guidelines)
+- Scholarship foundations
+- Youth career programs (Junior Achievement, FFA, FBLA, etc.)
+- Industry associations (electricians union, nursing association, etc.)
+- Career-focused books/courses appropriate for teens
+- Hospital systems recruiting future healthcare workers
+- Tech companies with internship/apprenticeship programs
+- Construction and skilled trades companies
+- STEM education programs and camps
+
+3.6 AD PLACEMENT TIERS & PRICING STRUCTURE
+Build the system to support tiered pricing:
+- Premium: Highway billboards, plaza digital displays, district sponsorships
+- Standard: Building-side ads, bus stop ads, mid-tier billboards
+- Entry: Bench ads, small kiosks, rotating display slots
+- Native: Sponsored mentor NPCs, sponsored career path experiences
+- Event: Time-limited sponsorships during career fairs, AMAs
+Pricing logic supports: monthly flat rate, per-impression CPM, 
+or per-click CPC models
+
+3.7 ADVERTISER PORTAL
+Separate login for advertisers to:
+- Upload and manage their ad creative
+- View campaign performance (impressions, clicks, engagement)
+- See demographic breakdowns (aggregated, never individual student data)
+- Pay invoices and renew campaigns
+- Submit new creative for approval
+
+=== PRIORITY 4: PLAYER ENGAGEMENT FEATURES ===
+
+4.1 ONBOARDING & QUEST SYSTEM
+- New player tutorial: Dario (the AI guide) appears at spawn
+- Welcome quest: "Visit any 3 career districts to unlock your first badge"
+- Quest log visible in HUD
+- Mission markers on minimap
+- Progressive unlock: complete quests to access new districts/features
+- Daily challenges: "Talk to 2 NPCs today" / "Take a career assessment"
+
+4.2 CAREER PROGRESSION SYSTEM
+- Each student has a "Career Explorer" profile
+- Visit buildings → earn XP for that career field
+- Reach milestones → earn badges (Apprentice, Specialist, Expert)
+- Badges visible on player profile and during interactions
+- "Career DNA" generated over time based on visited buildings, 
+  time spent, completed activities
+- Career match score updates as student explores
+
+4.3 INTERACTIVE OBJECTS IN WORLD
+- Career assessment kiosks scattered throughout city
+- "Day in the Life" video booths
+- Job shadow simulators (mini-games for each career)
+- Resume Builder station
+- Mock Interview rooms with AI interviewer
+- Career Fair area where multiple career NPCs gather
+- Scholarship kiosks (sponsored, see Priority 3)
+
+4.4 PERSONAL HUB / DORMITORY
+- Each student has a personal space they can customize
+- Trophy room showing earned badges
+- Career portfolio displayed on walls
+- Personal AI assistant (Dario) lives here
+- Friends list and current online status
+- Customizable avatar wardrobe
+
+=== PRIORITY 5: SOCIAL & COLLABORATIVE FEATURES ===
+
+5.1 SHARED SPACES
+- Auditorium for live events (career speakers, AMAs)
+- Group study rooms for collaborative learning
+- Sports/games area for casual hangout (with safety monitoring)
+- Career Fair plaza where students gather (prime sponsorship space)
+
+5.2 SCHEDULED EVENTS
+- Daily career spotlight (NPC speaker for 15 minutes)
+- Weekly career fair with multiple industries
+- Monthly competitions (resume contest, mock interview tournament)
+- Live AMAs with real industry professionals (vetted adults only)
+- Sponsored events from advertisers (e.g., "Tech Day brought to you by 
+  [Sponsor]")
+
+5.3 PEER INTERACTION (SAFETY-FIRST)
+- Group activities require 3+ students (no isolated 1-on-1 by default)
+- Project-based teams formed by AI matching (interests + grade level)
+- Peer mentor program (12th graders mentoring 7th-8th graders, all 
+  monitored)
+- Public bulletin boards for sharing achievements (moderated)
+
+=== PRIORITY 6: VISUAL POLISH ===
+
+6.1 LIGHTING IMPROVEMENTS
+- Soft global illumination
+- Volumetric fog in distance (atmospheric depth)
+- Building lights cast realistic glow at night
+- Billboard and digital display lights cast appropriate glow
+- Avatar shadows under feet
+- Rim lighting on player character
+
+6.2 ANIMATION UPGRADES
+- Smooth walk/run cycles for player
+- Idle animations when standing still (breathing, looking around)
+- Wave/dance/sit emotes (E key opens emote wheel)
+- Smooth camera movement with subtle bob during walking
+- Animated transitions between buildings
+- Animated digital billboards (videos and rotating ads)
+
+6.3 UI/UX POLISH
+- Larger, more legible district name signs
+- Floating tooltip when hovering over interactive elements
+- Improved minimap: clickable districts, friend dots, quest markers
+- Quest tracker in corner
+- Notification toast for achievements
+- Smooth fade transitions between UI states
+- Ad click → in-world info panel (never leaves platform)
+
+6.4 SOUND DESIGN
+- Ambient city soundscape (low volume background)
+- Footstep sounds matching surface (concrete, grass, wood)
+- UI sound effects (button clicks, menu opens, notifications)
+- Achievement fanfare for milestones
+- District-specific ambient music (low volume, optional toggle)
+- Voice acting for Dario (or high-quality TTS)
+
+=== PRIORITY 7: REALISM & IMMERSION ===
+
+7.1 PHYSICS & FEEL
+- Avatar has slight physics (body sway, head turn following look direction)
+- Objects can be picked up and examined (clipboard, tools, books)
+- Doors swing open with proper animation
+- Camera collision detection (camera doesn't clip through walls)
+
+7.2 SCALE & PROPORTION
+- Adjust building heights to feel impressive but not overwhelming
+- Add depth: foreground, midground, background elements
+- Distant city skyline visible beyond playable area (background ad 
+  surfaces possible here too)
+- Mountains or natural features on horizon
+- Skybox with realistic clouds
+
+7.3 PERFORMANCE OPTIMIZATION
+- LOD (level of detail) system for distant objects
+- Occlusion culling for buildings out of view
+- Instanced rendering for trees, lamp posts, NPCs
+- Lazy-load ad creative based on player proximity
+- Target 60fps on mid-range hardware
+- Mobile-friendly fallback graphics mode
+
+=== TECHNICAL IMPLEMENTATION NOTES ===
+
+- Use Three.js or Babylon.js (already in your stack presumably)
+- Implement ECS (Entity Component System) for NPCs and interactive objects
+- Use GLTF format for 3D models (efficient, web-optimized)
+- Animation via skeletal rigs (Mixamo for free animations to start)
+- WebSocket for real-time multiplayer state sync
+- Spatial audio for immersion (Howler.js or similar)
+- Save player progress to existing user database
+- Ad creative served via CDN for fast loading
+- Ad impression tracking via WebSocket events (when ad enters viewport)
+- All new chat/interaction features must route through existing 
+  safety-monitoring system (do not bypass moderation pipeline)
+
+=== SAFETY INTEGRATION ===
+
+Every new interactive feature must:
+- Respect existing trust score restrictions
+- Pass through AI moderation for any chat/text
+- Trigger parent notifications per existing rules
+- Maintain audit logging
+- Not introduce new private/unmonitored interaction surfaces
+
+Advertising-specific safety:
+- All ad creative reviewed by AI + human admin before going live
+- Ad click-throughs stay within platform (no external redirects for minors)
+- No personal data collection through ad interactions
+- Parents can view what ads their student has interacted with
+- Parents can opt their student out of ad personalization entirely
+
+=== DELIVERABLES ===
+
+1. Updated 3D world with all Priority 1-3 features
+2. NPC system with pathfinding and dialogue
+3. Quest/progression system integrated with user profiles
+4. Interior building scenes (at least one per district at launch)
+5. Updated UI with quest log, badges, improved minimap
+6. Sound design implementation
+7. Performance optimization pass
+8. Integration tests confirming safety system still functions
+9. Complete advertising infrastructure: ad surfaces in world, 
+   ad management dashboard, advertiser portal, content moderation 
+   pipeline for ads, impression/click tracking, billing-ready 
+   campaign management
+10. Ad surface inventory map showing all available placement locations 
+    with tier classifications (for sales team use)

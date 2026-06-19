@@ -1,0 +1,281 @@
+=== PART 13: PARENT IDENTITY VERIFICATION (LEAN & DEFENSIBLE STACK) ===
+
+13.1 PARENT CONTACT MODEL
+- One primary parent/guardian per student account
+- Required fields: full name, phone (mobile preferred), email, relationship to student
+- No support for multiple parent contacts at launch — primary parent is sole 
+  recipient of all alerts and dashboard access
+- Primary parent can be changed only via support request with re-verification
+
+13.2 MANDATORY VERIFICATION AT SIGNUP
+
+Step 1: Phone Verification (PRIMARY CHANNEL)
+- Parent enters mobile phone number
+- 6-digit SMS code sent via Twilio
+- Code expires in 10 minutes
+- Max 3 attempts before lockout
+- Must verify before proceeding
+
+Step 2: Carrier Lookup (AUTOMATIC, SILENT)
+- Run Twilio Lookup API on verified number
+- Capture: carrier name, line type (mobile/landline/VoIP), country
+- If line type = VoIP (Google Voice, TextNow, etc.):
+  → Account allowed but FLAGGED for enhanced monitoring
+  → Visible flag in admin dashboard
+  → Lower trust score ceiling for the student account (max 75)
+  → Increased AI moderation frequency on student conversations
+- If line type = landline: REJECT (account requires SMS-capable mobile)
+- If country ≠ US: REJECT at launch (US-only)
+
+Step 3: Email Verification (SECONDARY CHANNEL)
+- Parent enters email address
+- Clickable verification link sent
+- Link expires in 24 hours
+- Email used for: dashboard magic-link login, weekly digests, 
+  long-form content delivery, backup contact if SMS fails
+- Block known disposable email providers
+
+Step 4: Credit Card Identity Check
+- Parent enters credit/debit card via Stripe
+- $0.50 micro-charge processed (refunded automatically within 24 hours)
+- Cardholder name MUST match claimed parent name (fuzzy match allowed for 
+  minor variations like "Bob" vs "Robert")
+- If name mismatch: account blocked from full features pending manual review
+- If card declines: 2 retries allowed, then manual review queue
+- Store: cardholder name, last 4 digits, billing zip (NOT full card number — 
+  Stripe handles PCI compliance)
+
+13.3 IF SMS UNAVAILABLE
+- Account is REJECTED — phone-capable mobile number is mandatory
+- Display message: "1WayMirror World requires a mobile phone for parent 
+  safety alerts. If you don't have access to a mobile phone, please contact 
+  support@1waymirror.com for alternative options."
+- Support can manually verify edge cases (grandparents, accessibility issues, 
+  rural areas) via video call + notarized form — handled case-by-case, not 
+  through automated flow
+
+13.4 CONDITIONAL ESCALATION TO ID VERIFICATION
+
+Government ID + selfie verification (via Persona API, ~$2 per check) is 
+NOT required at signup. It is triggered automatically when ANY of these 
+conditions occur:
+
+Trigger conditions:
+- Carrier lookup flagged VoIP number
+- Credit card cardholder name mismatch with claimed parent name
+- Parent and student signed up from same device within 60 minutes
+- Multiple parent accounts share the same phone or email
+- Student gets flagged for Tier 3 or Tier 4 moderation event
+- Parent has zero engagement with dashboard or alerts for 60+ days
+- Anomalous login patterns on parent account
+- Manual admin escalation
+
+When triggered:
+- Parent receives SMS + email: "We need to verify your identity to keep 
+  [Student Name]'s account active. Tap here to complete verification 
+  (takes 2 minutes)."
+- Until completed, student account moves to RESTRICTED MODE 
+  (no DMs, supervised features only)
+- 14-day window to complete; after that, student account suspended 
+  pending verification
+- Persona handles ID upload, selfie match, document authenticity check
+- Failed verification → human admin review queue
+
+13.5 ALERT DELIVERY MODEL (SMS-PRIMARY, EMAIL-SUPPORTING)
+
+All alerts to parents follow this pattern:
+- Short alert message via SMS with dashboard deep-link
+- Full content lives on parent dashboard
+- Email used only for: weekly digest summaries, long-form transcripts, 
+  account/billing communications, magic-link logins
+
+SMS Alert Examples:
+
+Contact Exchange:
+"1WayMirror Alert: [Student Name] just exchanged contact info with another 
+user. Tap to review: [link]"
+
+Tier 2 Flag:
+"1WayMirror Alert: [Student Name]'s recent message was flagged for review. 
+Tap to view: [link]"
+
+Tier 3 Suspension:
+"1WayMirror URGENT: [Student Name]'s account has been paused for safety 
+review. We'll contact you within 1 hour. Details: [link]"
+
+Tier 4 Termination:
+"1WayMirror URGENT: A serious safety issue was detected. Please call us 
+immediately at [number] or tap here: [link]"
+
+Login Anomaly:
+"1WayMirror Alert: [Student Name] logged in from an unexpected location 
+([City, State]). Tap if this wasn't them: [link]"
+
+Verification Required:
+"1WayMirror: Please verify your identity to keep [Student Name]'s account 
+active. Tap here: [link]"
+
+Weekly Digest (SMS):
+"1WayMirror: [Student Name]'s weekly summary is ready. Tap to view: [link]"
+
+13.6 RED FLAG AUTO-DETECTION (PASSIVE BACKGROUND CHECKS)
+
+System continuously monitors for these fraud indicators:
+- Parent and student signups from same IP/device within 60 minutes
+- VoIP phone number on parent account
+- Credit card name mismatch (fuzzy match fails)
+- Multiple "parent" accounts sharing phone, email, or device fingerprint
+- Parent never opens SMS alerts (delivery confirmed but no link clicks)
+- Parent never logs into dashboard for 60+ days
+- Parent's claimed age inconsistent with student's claimed age 
+  (parent younger than 25 with 12th-grade student = soft flag)
+- Parent and student email patterns suspiciously similar
+- Failed ID verification attempts
+- Phone number recently created (carrier lookup metadata)
+- Burner carrier prefixes (TextNow, Google Voice, etc.)
+
+Each flag adds to a fraud score. Fraud score >threshold triggers 
+ID verification requirement (per 13.4).
+
+13.7 PARENT ENGAGEMENT TRACKING
+
+System tracks ongoing parent engagement signals:
+- SMS alert delivery confirmations (via Twilio)
+- SMS link click-through events
+- Dashboard login frequency
+- Email open rates (via SendGrid)
+- Response to escalation messages
+- Settings changes / profile updates
+
+If parent engagement score drops to zero for 60+ days:
+- Trigger re-verification flow
+- Send SMS + email: "We haven't heard from you in a while. Please verify 
+  you're still actively monitoring [Student Name]'s account."
+- 14-day window to respond
+- If no response: student account moves to RESTRICTED MODE until 
+  parent re-engages
+
+13.8 RE-VERIFICATION TRIGGERS
+
+Parent must complete re-verification when:
+- Annual cycle (every 12 months automatically — SMS code only, lightweight)
+- Phone number change requested (full re-verification: phone + carrier 
+  lookup + credit card)
+- Email change requested (email verification only)
+- Engagement drops to zero for 60+ days (lightweight re-verification)
+- After any Tier 3 or Tier 4 student event (full re-verification)
+- Admin manual flag (full re-verification including ID)
+
+13.9 PHONE NUMBER CHANGE FLOW
+
+When parent requests phone change:
+- Old phone number receives SMS code authorizing the change
+- Parent enters code on dashboard to confirm
+- New phone number receives separate verification code
+- Carrier lookup runs on new number
+- Credit card re-verification (cardholder name still matches)
+- If old phone is no longer accessible: ID verification required as 
+  alternative authorization
+
+13.10 SIBLINGS / MULTIPLE STUDENTS PER PARENT
+
+System allows one parent phone to be linked to multiple student accounts:
+- Cap: maximum 4 students per parent phone (anti-fraud limit)
+- Each student account verified independently
+- Parent dashboard shows all linked students in tabbed view
+- Alerts include student name to clarify which child triggered the alert
+- 5+ students under one parent phone triggers manual admin review
+
+13.11 DATA MODEL (POSTGRESQL SCHEMA EXCERPT)
+
+parents table:
+- id (UUID, primary key)
+- full_name (string)
+- phone_e164 (string, unique)
+- phone_carrier (string)
+- phone_line_type (enum: mobile, voip, landline)
+- phone_verified_at (timestamp)
+- email (string, unique)
+- email_verified_at (timestamp)
+- stripe_customer_id (string)
+- card_last4 (string)
+- card_holder_name (string)
+- card_verified_at (timestamp)
+- id_verification_status (enum: not_required, pending, verified, failed)
+- id_verified_at (timestamp, nullable)
+- fraud_score (integer, 0-100)
+- engagement_score (integer, 0-100)
+- last_alert_sent_at (timestamp)
+- last_dashboard_login_at (timestamp)
+- voip_flag (boolean)
+- created_at (timestamp)
+- updated_at (timestamp)
+
+parent_student_links table:
+- id (UUID, primary key)
+- parent_id (UUID, foreign key)
+- student_id (UUID, foreign key)
+- relationship (string: mother, father, guardian, etc.)
+- is_primary (boolean — always true at launch, future-proofing)
+- created_at (timestamp)
+- UNIQUE constraint on (parent_id, student_id)
+
+verification_events table:
+- id (UUID, primary key)
+- parent_id (UUID, foreign key)
+- event_type (enum: phone_verify, email_verify, card_verify, id_verify, 
+  re_verify, fraud_flag)
+- status (enum: pending, success, failed)
+- metadata (JSONB — carrier info, IP, device fingerprint, etc.)
+- created_at (timestamp)
+
+13.12 COST MODEL (PER PARENT)
+
+Lean & Defensible verification stack:
+- SMS verification: ~$0.02
+- Carrier lookup (Twilio): ~$0.005
+- Email verification: ~$0.001
+- Credit card micro-charge (Stripe fees): ~$0.30
+
+Standard cost per parent: ~$0.33
+
+Conditional ID verification (Persona): ~$2.00 per check
+Triggered for ~5-10% of accounts based on red flags
+Blended average across all parents: ~$0.50-0.70 per parent
+
+Annual re-verification (lightweight SMS only): ~$0.02 per parent per year
+
+Estimated launch costs:
+- 100 students: ~$50-70
+- 500 students: ~$250-350
+- 1,000 students: ~$500-700
+- 5,000 students: ~$2,500-3,500
+
+13.13 INTEGRATIONS REQUIRED
+
+- Twilio (SMS verification + alerts + carrier lookup)
+- SendGrid or Postmark (email verification + digests)
+- Stripe (credit card micro-charge verification)
+- Persona (conditional ID verification, triggered only on red flags)
+- FingerprintJS (device fingerprinting for fraud detection)
+- MaxMind or IP-API (IP geolocation for parent login monitoring)
+
+13.14 COMPLIANCE & LEGAL DOCUMENTATION
+
+Every verification event must be logged with:
+- Timestamp
+- Method used
+- Result (pass/fail/flagged)
+- IP address
+- Device fingerprint
+- Parent identifiers used
+
+This audit trail is critical for:
+- COPPA compliance (parental consent records)
+- FERPA compliance (if school partnerships)
+- Legal defense if a safety incident occurs
+- Law enforcement cooperation in Tier 4 events
+- Insurance and liability documentation
+
+Retain verification records for minimum 7 years per general legal guidance 
+(consult counsel for jurisdiction-specific requirements).

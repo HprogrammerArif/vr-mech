@@ -1,0 +1,241 @@
+GOAL: Transform the current /replitopolis page from a flat 2D skyline banner 
+into a true isometric 3D walkable career city. DO NOT rebuild the app. 
+DO NOT delete existing routes, simulations, NPCs, building data, quest 
+system, Career Passport, mini-map logic, or the dashboard UI panels 
+(Today's Quests, Mentor Spotlight, Upcoming Events, Your Stats, City Map, 
+Career Passport, bottom nav). Keep all of those exactly as they are.
+
+═══════════════════════════════════════════════════════════════════
+STEP 0 — INSPECT THE REPO BEFORE WRITING ANY CODE
+═══════════════════════════════════════════════════════════════════
+
+Before generating ANY new files, you must first scan the existing 
+project and report back the following. Do not skip this step. Do not 
+guess. If anything is unclear, open the file and read it.
+
+A. FRONTEND STACK DETECTION
+   Look at package.json and the project root. Report:
+   - Is this a React project? (check for "react" in dependencies)
+   - If React: is it Next.js, Vite + React, Create React App, or 
+     Remix? (check scripts and config files)
+   - If NOT React: is it plain HTML + vanilla JS, Express + EJS/Pug, 
+     Svelte, Vue, or something else?
+   - What styling system is in use? (Tailwind, CSS modules, styled-
+     components, plain CSS)
+   
+   THEN CHOOSE THE 3D RENDERER ACCORDINGLY:
+   - If React (any flavor) → use @react-three/fiber + @react-three/drei
+   - If plain HTML/Express/vanilla → use Three.js as ES modules 
+     directly, no React wrapper
+   - If Svelte → use threlte
+   - If Vue → use TresJS
+   Install the correct packages. Do not mix renderers.
+
+B. BUILDING & DISTRICT DATA SOURCE DETECTION
+   Find where the existing buildings, districts, and NPCs are stored. 
+   Check in this order and report which one applies:
+   
+   1. Static data file? Look in /data, /src/data, /lib/data, 
+      /constants for files like districts.ts, buildings.json, 
+      replitopolisData.ts, npcMentors.ts, etc.
+   2. Database? Check for /prisma/schema.prisma, /db, /models, 
+      drizzle config, or any ORM. Look for tables named buildings, 
+      districts, simulations, npcs.
+   3. API routes? Check /api, /pages/api, /app/api, /routes for 
+      endpoints that return building or district data.
+   4. Hardcoded inside components? If district names appear directly 
+      inside JSX/HTML files with no separate data source.
+   
+   THEN ADAPT THE PROMPT BELOW:
+   - If static file → "import from <exact path you found>"
+   - If database → "fetch from <exact API endpoint or query>" and 
+     reuse existing data-fetching pattern (React Query, SWR, fetch, 
+     getServerSideProps, etc.)
+   - If hardcoded → first extract the data into /data/cityLayout.ts 
+     as an additive step, do NOT delete the original until the new 
+     scene is verified working
+   
+   DO NOT create duplicate copies of building/district data. The 3D 
+   scene must read from the same source the existing card UI reads 
+   from, so adding a building in one place adds it everywhere.
+
+C. EXISTING HANDLERS TO REUSE
+   Find and report:
+   - The function/handler called when a user clicks a district card 
+     or building today (probably opens a panel or routes to a sim)
+   - The component that renders the building detail panel
+   - The mentor chat panel component (if it exists)
+   - The simulation entry point (route or function)
+   
+   The new 3D scene must call these exact same handlers — do not 
+   write parallel versions.
+
+REPORT ALL OF THE ABOVE BACK TO ME IN A SHORT SUMMARY BEFORE WRITING 
+CODE. Then proceed to the build steps below using the stack and data 
+source you confirmed.
+
+═══════════════════════════════════════════════════════════════════
+WHAT'S BROKEN RIGHT NOW
+═══════════════════════════════════════════════════════════════════
+
+The center of the /replitopolis page shows a flat 2D row of cartoon 
+buildings as a background image. There is no actual city — no 
+streets, no depth, no walkable space, no isometric perspective. 
+Below it are district CARDS (Engineering, Technology, Business, 
+etc.) which work fine as a list view but are not a city. Students 
+opening this expect to see something that looks like SimCity or 
+Roblox, not a banner + accordion.
+
+═══════════════════════════════════════════════════════════════════
+WHAT TO BUILD INSTEAD
+═══════════════════════════════════════════════════════════════════
+
+1. ISOMETRIC 3D CITY CANVAS
+   - Replace the flat 2D building banner with a real isometric scene.
+   - Use the renderer you selected in Step 0-A.
+   - Camera: orthographic, isometric angle (~30° elevation, ~45° 
+     rotation), smooth zoom/pan with damping.
+   - Render low-poly buildings as actual 3D meshes with varied 
+     heights (8–40 units), varied footprints, and emissive neon 
+     window materials.
+   - Reference look: low-poly gray/white skyscrapers with depth, 
+     shadows, and street-level visibility — but recolored per 
+     district with neon accents.
+
+2. CITY LAYOUT (TOP-DOWN GRID)
+   Center: Career Hub roundabout (glowing, pulsing).
+   9 districts arranged like a wheel around it:
+       NW: Engineering        N: Technology       NE: Business
+        W: Trades         CENTER: Career Hub       E: Healthcare
+       SW: Law/PublicSvc      S: Exploratory     SE: Entrepreneurship
+   South edge: LiveWorld plaza (separate, social zone).
+   
+   Each district = a 4x4 to 6x6 block of buildings on its own 
+   colored ground plate, connected to the Career Hub by a lit road.
+
+3. DISTRICT THEMING (ground tint + window glow)
+   - Engineering: electric blue (#00B4FF) + steel gray
+   - Technology: neon purple (#A855F7) + magenta
+   - Business: gold (#FFB800) + amber
+   - Healthcare: teal/red cross (#14B8A6 + #EF4444 accents)
+   - Trades: orange (#F97316) + warning yellow
+   - Law/Public Service: deep teal (#0EA5E9) + white marble
+   - Exploratory: green (#22C55E) + lime
+   - Entrepreneurship: pink/coral (#EC4899)
+   - LiveWorld: pink+purple gradient (#F472B6 → #A78BFA)
+
+4. STREET-LEVEL DETAIL
+   - Roads: dark asphalt with neon edge strips matching district 
+     color.
+   - Sidewalks, crosswalks, stop signs, streetlights (emissive), 
+     benches, trees (low-poly cones), parked cars (simple boxes 
+     with headlight emissive).
+   - 2–4 cars slowly animating along main avenues using a tween loop.
+   - Central roundabout around the Career Hub with rotating ring of 
+     light.
+
+5. BUILDINGS (DRIVEN BY EXISTING DATA — SEE STEP 0-B)
+   - Read from the data source you identified in Step 0-B. Do NOT 
+     duplicate data.
+   - Each building in the existing data array becomes one 3D mesh.
+   - Building variety: skyscrapers (tall+thin), mid-rises (medium 
+     boxes), plazas (wide+short), landmark buildings (unique shape 
+     per district — e.g. dome for Healthcare, columned courthouse 
+     for Law, hangar for Aerospace).
+   - Floating glowing label above each building with the building 
+     name. Labels billboard toward camera and fade by distance.
+   - Hover: building lifts 0.3 units, outline glows district color, 
+     cursor becomes pointer.
+   - Click: call the EXISTING building-detail handler from Step 0-C. 
+     Do not write a new one.
+   - Pulsing ring on the ground under buildings with available 
+     simulations the user hasn't completed.
+
+6. AVATAR + WALKING (REUSE EXISTING MOVEMENT IF FOUND IN STEP 0)
+   - Player spawns at Career Hub.
+   - WASD or arrow keys to move avatar (capsule or simple low-poly 
+     figure).
+   - Camera follows avatar with smooth lerp.
+   - Walking within ~3 units of a building auto-highlights it; 
+     pressing E or clicking opens the existing building panel.
+
+7. NPCs IN THE WORLD
+   - Place existing NPC mentor data (from Step 0-B source) as 3D 
+     figures in their relevant district.
+   - Floating name + role label above each.
+   - Click → open existing mentor chat panel from Step 0-C.
+   - 4–8 ambient NPCs walking on randomized sidewalk paths for life.
+
+8. MINI-MAP UPGRADE
+   - Replace the current text "City Map" list with a real 2D 
+     top-down mini-map in the lower-left, showing district color 
+     blocks, the Career Hub, player position as a pulsing dot, and 
+     clickable zones that pan the camera.
+   - Keep the existing district list as a collapsible legend below.
+
+9. KEEP UNTOUCHED
+   - Top bar (Replitopolis logo, level, XP, friends, badges).
+   - Today's Quests panel (left).
+   - Mentor Spotlight + Upcoming Events + Your Stats panels (right).
+   - The "Go to 3D City" button can be removed or repurposed since 
+     the page IS now the 3D city.
+   - Career Passport widget.
+   - Bottom nav (Home, City, Simulations, Badges, Journal, Settings).
+   - All routing, all simulation entry points, all auth.
+
+10. PERFORMANCE
+    - Instanced meshes for repeated building types and streetlights.
+    - Frustum culling on labels.
+    - Cap pixel ratio at 2.
+    - Lazy-load the 3D scene only when /replitopolis is active.
+    - Provide a "Lite Mode" toggle that swaps the 3D scene for the 
+      current 2D card layout as fallback for low-end devices.
+
+11. RESPONSIVE
+    - Desktop first.
+    - Tablet: shrink HUD panels.
+    - Mobile: hide side panels behind a FAB; movement becomes 
+      tap-to-walk.
+
+═══════════════════════════════════════════════════════════════════
+FILE STRUCTURE TO ADD (do not move existing files)
+═══════════════════════════════════════════════════════════════════
+
+Adapt extensions to the stack you confirmed in Step 0-A 
+(.tsx for React+TS, .jsx for React+JS, .js for vanilla, .svelte 
+for Svelte, etc.):
+
+   /components/replitopolis/scene/CityScene
+   /components/replitopolis/scene/Building3D
+   /components/replitopolis/scene/District3D
+   /components/replitopolis/scene/Road
+   /components/replitopolis/scene/Avatar
+   /components/replitopolis/scene/NPC3D
+   /components/replitopolis/scene/CareerHub
+   /components/replitopolis/scene/MiniMap3D
+   /components/replitopolis/scene/CityLights
+   /hooks/useCityCamera        (or equivalent for non-React stack)
+   /hooks/usePlayerMovement
+   /data/cityLayout            (district coords, road paths only — 
+                                NOT a copy of building data)
+
+═══════════════════════════════════════════════════════════════════
+DELIVERABLE FOR THIS PASS
+═══════════════════════════════════════════════════════════════════
+
+Just the 3D scene replacing the flat banner, with:
+   - Districts laid out
+   - Buildings placed from EXISTING data source
+   - Career Hub roundabout
+   - Basic roads
+   - Click-to-open existing building panels working
+
+NO NPCs, NO avatar walking, NO mini-map upgrade yet — those are 
+pass 2.
+
+At the end, report:
+   1. The stack you detected and the renderer you chose
+   2. The data source you connected to
+   3. The existing handlers you reused
+   4. Every file added or modified
+   5. Anything you had to skip or stub

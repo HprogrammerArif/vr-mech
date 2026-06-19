@@ -1,0 +1,340 @@
+GOAL: Two upgrades to the existing Replitopolis app, done in order.
+PASS 1 = transform the /replitopolis page from a flat 2D banner into a 
+dense, lived-in 3D isometric career city.
+PASS 2 = upgrade the existing VR/3D career simulations so the graphics 
+look polished, not prototype.
+
+DO NOT rebuild the app. DO NOT delete or rename existing routes, 
+simulations, NPCs, building data, quest system, Career Passport, 
+mini-map logic, top bar, side panels, bottom nav, auth, or database 
+schemas. Everything that works today must keep working.
+
+═══════════════════════════════════════════════════════════════════
+STEP 0 — INSPECT THE REPO BEFORE WRITING ANY CODE
+═══════════════════════════════════════════════════════════════════
+
+Before generating any new files, scan the project and report back. 
+Do not skip this step. Do not guess.
+
+A. FRONTEND STACK DETECTION
+   Look at package.json and project root. Report:
+   - Is this React (Next.js, Vite, CRA, Remix), plain HTML+vanilla JS, 
+     Express+templating, Svelte, or Vue?
+   - Styling system (Tailwind, CSS modules, styled-components, plain).
+   
+   PICK THE 3D RENDERER ACCORDINGLY:
+   - React → @react-three/fiber + @react-three/drei
+   - Plain HTML/Express/vanilla → Three.js as ES modules
+   - Svelte → threlte
+   - Vue → TresJS
+   Install the matching packages. Do not mix renderers.
+
+B. DATA SOURCE DETECTION
+   Find where buildings, districts, NPCs, and SIMULATIONS are stored. 
+   Check in order:
+   1. Static files (/data, /src/data, /lib, /constants)
+   2. Database (/prisma, /db, /models, drizzle)
+   3. API routes (/api, /pages/api, /app/api, /routes)
+   4. Hardcoded inside JSX
+   
+   The new 3D city and the upgraded simulations must read from the 
+   SAME source the existing UI reads from. No duplicate data.
+
+C. EXISTING HANDLERS TO REUSE
+   Find and report:
+   - The function fired when a user clicks a building or district card
+   - The building detail panel component
+   - The mentor chat panel component
+   - The simulation entry route/function (this is critical for Pass 2)
+   - The component that renders each VR/3D simulation today
+
+REPORT A, B, AND C BACK BEFORE WRITING CODE.
+
+═══════════════════════════════════════════════════════════════════
+PASS 1 — DENSE LIVED-IN ISOMETRIC CITY
+═══════════════════════════════════════════════════════════════════
+
+The current /replitopolis shows a flat 2D skyline banner. Replace it 
+with a real isometric 3D city. The city must feel alive — not a 
+collection of buildings on empty plates.
+
+1. ISOMETRIC 3D CANVAS
+   - Use the renderer from Step 0-A.
+   - Orthographic camera, ~30° elevation, ~45° rotation, smooth 
+     pan/zoom with damping.
+   - Dark navy + purple atmospheric night sky, volumetric fog/glow.
+
+2. CITY LAYOUT
+   Center: Career Hub roundabout (gold pyramid, glowing ring, 
+   pulsing).
+   9 districts arranged like a wheel:
+       NW: Engineering        N: Technology       NE: Business
+        W: Trades         CENTER: Career Hub       E: Healthcare
+       SW: Law/PublicSvc      S: Exploratory     SE: Entrepreneurship
+   South edge: LiveWorld plaza.
+   Each district = 4-6 buildings of varied height/footprint on a 
+   colored ground plate, connected to the hub by lit roads.
+
+3. DISTRICT THEMING (ground tint + window glow)
+   Engineering: electric blue (#00B4FF)
+   Technology: neon purple (#A855F7)
+   Business: gold (#FFB800)
+   Healthcare: teal (#14B8A6) with red cross accent
+   Trades: orange (#F97316)
+   Law/Public Service: deep teal (#0EA5E9)
+   Exploratory: green (#22C55E)
+   Entrepreneurship: pink (#EC4899)
+   LiveWorld: pink/purple gradient
+
+4. BUILDINGS (DRIVEN BY EXISTING DATA)
+   - Each building from Step 0-B = one 3D mesh.
+   - Mix skyscrapers (tall+thin), mid-rises, plazas, and one landmark 
+     per district (dome for Healthcare, columned courthouse for Law, 
+     hangar for Aerospace, etc.).
+   - Emissive neon windows in district color.
+   - Floating billboard label above each building, fades by distance.
+   - Hover: lift 0.3 units + outline glow.
+   - Click: call existing handler from Step 0-C. Do NOT write a new 
+     panel.
+   - Pulsing ground ring under buildings with incomplete simulations.
+
+5. STREETS AND ROADS
+   - Wet asphalt with neon edge strips matching district color.
+   - 4-lane main avenues from hub to each district.
+   - Center yellow dashed line, side white lines.
+   - Sidewalks on both sides of every road.
+   - Crosswalks at intersections.
+   - 2 traffic lights per intersection, cycling red/yellow/green.
+   - Stop signs at minor junctions.
+
+6. GAP-FILLERS (MAKES THE CITY FEEL ALIVE — DO NOT SKIP)
+   
+   STORES & SHOPS — Place 6-10 small storefronts on the streets 
+   between districts, NOT inside districts:
+   - Coffee café (warm yellow glow, awning, outdoor table)
+   - Pizza shop (red/yellow signage)
+   - Arcade (purple neon, animated marquee)
+   - Bookstore (green, warm windows)
+   - Boba/ramen shop
+   - Food truck x2 (taco truck, ramen truck) parked at curbs
+   - Small bodega/convenience store
+   - These are clickable → show "Coming soon" tooltip (no sim wiring)
+   
+   VEHICLES — Animated, moving on the roads:
+   - 1 yellow taxi
+   - 1 city bus (longer, multi-window, route number on front)
+   - 2-3 sedans of different colors moving in opposite directions
+   - 1 sports car (faster speed)
+   - 2 motor scooters with rider sprites
+   - 4-6 parked cars on side streets
+   - All vehicles use Three.js tween/curve following road paths.
+   - Headlights cast emissive glow forward, taillights red glow back.
+   
+   PEDESTRIANS — 12-20 simple low-poly figures:
+   - Walking on sidewalks along randomized paths.
+   - Small variation in clothing color and skin tone.
+   - Some standing/idling at bus stops.
+   - These are AMBIENT, not interactive — don't add click handlers.
+   
+   PARKS, PLAZAS, GRASS — Critical for filling empty space:
+   - 2 small parks between districts: green grass plate, low-poly 
+     trees (cone + sphere), benches, paths, one with a fountain 
+     (cylindrical with blue water + light pillar).
+   - GRASS MEDIAN STRIPS down the center of major roads (thin green 
+     planters with small trees every 20 units).
+   - GRASS CORNERS at intersections — small triangular green patches 
+     where roads meet.
+   - PLANTERS on sidewalks — rectangular green boxes with shrubs 
+     every 30 units along sidewalks.
+   - 1 central plaza ringing the Career Hub: stone tile pattern, 
+     benches, 4 trees, a holographic statue.
+   
+   BILLBOARDS & HOLOGRAMS:
+   - 3 large billboards above shops with rotating ads ("Explore 50+ 
+     Careers", "Earn Badges · Level Up", "Join LiveWorld").
+   - 2 holographic projections above district landmarks (rotating 3D 
+     icons in district color — e.g. a glowing brain over Tech, a 
+     dollar sign over Business).
+   - Animated neon signage on shopfronts (subtle pulse).
+   
+   MONORAIL:
+   - Elevated track running across the top of the map, behind the 
+     buildings.
+   - 1 monorail train with 3 cars, animated to slide across slowly 
+     and loop.
+   - 2 station stops with platform + lit signs.
+   - The track has support pillars every 80 units.
+
+7. AVATARS — HIGH SCHOOL AGE (15–18)
+   - The player avatar and any visible NPCs in the city must read as 
+     teenagers, not adult professionals.
+   - Diverse: include white, Black, Latina, Asian, and South Asian 
+     character options.
+   - Outfits: hoodies, varsity jackets, polos, jeans, sneakers, 
+     backpacks. NOT business suits, scrubs, or hard hats by default.
+   - Career interest is shown via a small accessory (laptop bag, 
+     stethoscope pin, tool keychain, debate folder) — not full 
+     profession costume.
+   - Default 6 student archetypes: Emma (Tech), Marcus (Biz), 
+     Sophia (Med), Jake (Trades), Zara (Law), and one more for 
+     Exploratory/Arts of your choosing.
+   - Mentors are SEPARATE: render mentor NPCs as early-20s young 
+     pros (not 40-something) so high schoolers find them relatable.
+
+8. MINI-MAP UPGRADE
+   - Replace text "City Map" list with a real 2D top-down mini-map 
+     bottom-left.
+   - Shows district color zones, hub, player position as pulsing 
+     dot, monorail line, parks.
+   - Click a zone to pan camera there.
+
+9. KEEP UNTOUCHED
+   - Top bar (logo, level, XP, friends, badges).
+   - Today's Quests panel (left).
+   - Mentor Spotlight, Upcoming Events, Your Stats panels (right).
+   - Career Passport widget.
+   - Bottom nav (Home, City, Simulations, Badges, Journal, Settings).
+   - All routing, all auth.
+
+10. PERFORMANCE
+    - InstancedMesh for repeated buildings, streetlights, trees, 
+      pedestrians.
+    - Frustum culling on labels.
+    - Cap pixel ratio at 2.
+    - Lazy-load 3D scene only on /replitopolis.
+    - "Lite Mode" toggle that swaps the 3D scene for the current 2D 
+      card layout for low-end devices.
+
+═══════════════════════════════════════════════════════════════════
+PASS 2 — UPGRADE THE VR / 3D SIMULATION GRAPHICS
+═══════════════════════════════════════════════════════════════════
+
+The existing career simulations look like a prototype. Polish the 
+graphics without breaking simulation logic, scoring, or progress 
+tracking.
+
+DO NOT rewrite simulation gameplay. DO NOT change the data they save. 
+DO NOT change which simulations exist or how they're routed. ONLY 
+upgrade the visual layer.
+
+For EACH simulation found in Step 0-B/0-C:
+
+1. RENDERER UPGRADE
+   - If using basic Three.js MeshBasicMaterial, upgrade to 
+     MeshStandardMaterial with proper PBR (metalness, roughness, 
+     albedo).
+   - Enable shadows (PCFSoftShadowMap).
+   - Add proper lighting: 1 directional sun light + 1 ambient + 
+     environment HDR (use drei's <Environment preset="city" /> or 
+     equivalent).
+   - Enable tone mapping (ACESFilmicToneMapping) and correct color 
+     space (SRGBColorSpace).
+
+2. POST-PROCESSING (subtle, not overdone)
+   - Bloom on emissive materials (glowing screens, neon signs).
+   - SSAO or contact shadows for depth.
+   - Slight vignette.
+   - Use @react-three/postprocessing for React stacks.
+
+3. ASSETS
+   - Replace primitive placeholder cubes/spheres with low-poly GLTF 
+     models from the public domain (Kenney.nl, Poly Pizza, 
+     Quaternius). For each simulation, source 3-5 relevant props:
+       AI/Tech sim: monitor, keyboard, server rack, robot arm
+       Healthcare sim: hospital bed, IV stand, monitor, stethoscope
+       Trades sim: toolbox, ladder, drill, workbench
+       Engineering sim: blueprints, gears, crane model
+       etc.
+   - Load via useGLTF (drei) and cache.
+   - Compress with draco if files exceed 1MB.
+
+4. ENVIRONMENTS
+   - Each simulation gets a proper room/setting instead of empty 
+     space:
+       Indoor sims: floor + 4 walls + ceiling, with windows showing 
+       the Replitopolis skyline outside.
+       Outdoor sims: ground plane with grass texture, sky dome, 
+       distant city silhouette.
+   - Use baseColor + normal map textures (free from polyhaven.com or 
+       ambientCG) for floors, walls, surfaces. Avoid flat solid 
+       colors.
+
+5. CHARACTERS IN SIMULATIONS
+   - If sims use placeholder character meshes, swap to Mixamo-style 
+     rigged low-poly characters or Ready Player Me avatars.
+   - Match the high-school-age aesthetic from Pass 1.
+   - Add idle and interaction animations from Mixamo (free).
+
+6. UI INSIDE SIMULATIONS
+   - Sim HUD must use the same style as the rest of the app: dark 
+     navy panels, neon accent colors per district, glowing text, 
+     same font.
+   - Add a "Pause" button, "Exit Simulation" button (returns to 
+     city), and a progress bar.
+
+7. PERFORMANCE GUARDRAILS
+   - Cap simulation scenes at 60fps target.
+   - Use LOD for any complex GLTF.
+   - Lazy-load each simulation route — never load all sim assets at 
+     once.
+
+8. DO NOT BREAK
+   - Existing simulation scoring logic
+   - Progress saving / Career Passport updates
+   - Any database writes the simulations make
+   - Existing simulation routes
+
+═══════════════════════════════════════════════════════════════════
+FILE STRUCTURE
+═══════════════════════════════════════════════════════════════════
+
+Adapt extensions to the stack from Step 0-A.
+
+NEW FOR PASS 1:
+   /components/replitopolis/scene/CityScene
+   /components/replitopolis/scene/Building3D
+   /components/replitopolis/scene/District3D
+   /components/replitopolis/scene/Road
+   /components/replitopolis/scene/Vehicle
+   /components/replitopolis/scene/Pedestrian
+   /components/replitopolis/scene/Shop
+   /components/replitopolis/scene/Park
+   /components/replitopolis/scene/Billboard
+   /components/replitopolis/scene/Monorail
+   /components/replitopolis/scene/Avatar
+   /components/replitopolis/scene/CareerHub
+   /components/replitopolis/scene/MiniMap3D
+   /components/replitopolis/scene/CityLights
+   /hooks/useCityCamera
+   /hooks/usePlayerMovement
+   /data/cityLayout            (district coords, road paths, shop 
+                                positions, monorail path — NOT 
+                                building data)
+
+NEW FOR PASS 2 (shared sim helpers):
+   /components/simulations/shared/SimEnvironment
+   /components/simulations/shared/SimLighting
+   /components/simulations/shared/SimPostFX
+   /components/simulations/shared/SimHUD
+   /assets/models/             (GLTF prop library)
+   /assets/textures/           (PBR texture library)
+
+DO NOT MOVE OR DELETE EXISTING SIMULATION FILES. Modify in place to 
+import the new shared helpers above.
+
+═══════════════════════════════════════════════════════════════════
+DELIVERABLE ORDER
+═══════════════════════════════════════════════════════════════════
+
+Do Pass 1 first, completely. Show me the result. Wait for confirmation 
+before starting Pass 2.
+
+When you finish Pass 1, report:
+1. Stack and renderer used
+2. Data source connected
+3. Existing handlers reused
+4. Files added/modified
+5. Anything stubbed or skipped
+6. Screenshot or instructions to view
+
+Do not begin Pass 2 until I confirm Pass 1 looks right.

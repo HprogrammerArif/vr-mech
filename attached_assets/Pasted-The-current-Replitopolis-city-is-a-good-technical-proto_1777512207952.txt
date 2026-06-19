@@ -1,0 +1,106 @@
+The current Replitopolis city is a good technical prototype, but it is visually too empty and underdeveloped. Do not rebuild the app from scratch and do not break the existing movement, map, NPC, or building-click functionality. Keep the existing core structure, but upgrade the visual design significantly.
+
+Goal:
+Make Replitopolis feel like a polished futuristic neon career city, not a simple block layout.
+
+Improve the city with these upgrades:
+
+1. City Density
+- Add more buildings in each district.
+- Buildings should vary in height, width, shape, and color.
+- Add skyscrapers, mid-rise buildings, smaller offices, plazas, and landmark buildings.
+- Districts should feel full and intentional, not scattered.
+- Keep the city walkable and not ridiculously wide.
+
+2. District Identity
+Each district should have a clear visual theme:
+- Engineering: electric blue, steel, bridges, cranes, robotics signs
+- Technology: purple/neon, circuit patterns, AI holograms, cybersecurity tower
+- Business: gold/orange, finance towers, marketing billboards, startup office
+- Healthcare: red/white/teal, hospital signs, medical cross, clinic buildings
+- Trades: orange/yellow, workshops, garages, construction equipment
+- Law/Public Service: teal/blue, courthouse, civic buildings, police/emergency center
+- Exploratory: green, career center, counseling hub, discovery dome
+- LiveWorld: pink/purple social plaza, event arena, friend lounge
+
+3. Roads and Walkability
+- Add actual roads, sidewalks, crosswalks, intersections, street lamps, stop signs, traffic lights, parked cars, moving cars if possible, benches, trees, and plazas.
+- Add a central roundabout around the Career Hub.
+- Add clearly connected roads from the Career Hub to each district.
+- Make the player start in the Career Hub.
+
+4. Labels and Navigation
+- Add large glowing district signs above or near each district.
+- Add building labels for important buildings.
+- Add a better mini-map with district colors and a “You are here” marker.
+- Add waypoint markers so users can find the building they need.
+- Add a floating “Career Bulletin Board” near the Career Hub.
+
+5. Career Bulletin Board
+Create a visible board or UI panel with:
+- Recommended simulation to try next
+- Careers not explored yet
+- Daily tasks
+- “Explore a new district”
+- “Talk to 2 career mentors”
+- “Complete a team simulation”
+- “Visit LiveWorld”
+
+6. NPCs and People
+- Add more NPCs walking or standing around the city.
+- NPCs should have career labels above them:
+  - AI Engineer
+  - Nurse
+  - Electrician
+  - Startup Founder
+  - Attorney
+  - Civil Engineer
+  - Data Analyst
+  - Social Worker
+- Make NPCs clickable.
+- When clicked, open a mentor chat panel.
+
+7. Better Visual Style
+- Use a futuristic neon city look.
+- Add glowing windows.
+- Add animated billboards.
+- Add neon road edges.
+- Add ambient lighting.
+- Add shadows.
+- Add skyline depth.
+- Add city background elements.
+- Add hover effects on buildings.
+- Add pulsing markers on enterable buildings.
+
+8. Better UI Overlay
+Add polished UI panels similar to a game dashboard:
+- Top bar with user level, XP, badges, friends
+- Left panel with Career Quests
+- Right panel with Mentor Spotlight or selected building info
+- Bottom navigation for Home, Simulations, Mentors, Friends, Badges, Journal
+- Keep it clean and not overwhelming.
+
+9. Building Interaction
+When a user approaches or clicks a building:
+- Highlight the building
+- Show building name
+- Show district
+- Show career topic
+- Show available simulations
+- Add “Start Simulation” button
+- Add “Talk to Mentor” button
+- Add “Invite Friend” button
+
+10. Technical Boundaries
+Important:
+- Do not delete current features.
+- Do not break player movement.
+- Do not break current building-click simulation entry.
+- Do not remove existing map logic.
+- Improve visuals by adding components, assets, geometry, styling, and better layout.
+- If performance becomes an issue, use simple optimized low-poly models, but make them visually polished.
+- Keep this desktop-first.
+- After changes, list exactly what files were modified.
+
+Visual target:
+The city should feel like a top-down/isometric futuristic version of SimCity + Roblox + a career campus. It should feel alive, dense, colorful, and clearly organized by career districts.

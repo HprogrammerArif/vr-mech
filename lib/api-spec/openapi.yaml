@@ -1,0 +1,507 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: simulations
+    description: Career simulation catalog
+  - name: missions
+    description: AI-generated career missions
+  - name: progress
+    description: Learner progress and stats
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /simulations:
+    get:
+      operationId: listSimulations
+      tags: [simulations]
+      summary: List available career simulations
+      responses:
+        "200":
+          description: List of simulations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Simulation"
+
+  /simulations/{slug}:
+    get:
+      operationId: getSimulation
+      tags: [simulations]
+      summary: Get a single simulation by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Simulation detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Simulation"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /missions/next:
+    post:
+      operationId: generateNextMission
+      tags: [missions]
+      summary: Generate the next AI mission for a career simulation
+      description: Uses AI to generate a fresh, immersive career mission tailored to the learner's level.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateMissionBody"
+      responses:
+        "200":
+          description: Generated mission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Mission"
+
+  /missions/{id}/submit:
+    post:
+      operationId: submitMission
+      tags: [missions]
+      summary: Submit a decision for a mission
+      description: Records the learner's decision, evaluates it, and returns AI-written feedback.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitMissionInput"
+      responses:
+        "200":
+          description: Evaluation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MissionResult"
+        "404":
+          description: Mission not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /missions/{id}/hint:
+    post:
+      operationId: getMissionHint
+      tags: [missions]
+      summary: Get a context-aware AI hint for a mission
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Hint text
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HintResponse"
+        "404":
+          description: Mission not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /progress:
+    get:
+      operationId: getProgress
+      tags: [progress]
+      summary: Get learner progress and stats
+      parameters:
+        - name: learnerId
+          in: query
+          required: true
+          schema:
+            type: string
+            description: Anonymous learner identifier stored client-side
+      responses:
+        "200":
+          description: Progress summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Progress"
+
+  /progress/recent:
+    get:
+      operationId: getRecentMissions
+      tags: [progress]
+      summary: Recent missions attempted by a learner
+      parameters:
+        - name: learnerId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Recent attempts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MissionAttempt"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    SimulationCategory:
+      type: string
+      enum: [engineering, business, healthcare, trades, technology, law, science, life-advice, creative-design]
+
+    EnvironmentKind:
+      type: string
+      enum:
+        - mech-lab
+        - construction-site
+        - circuit-board
+        - chem-plant
+        - factory-floor
+        - office-desk
+        - hospital-room
+        - server-room
+        - data-viz
+        - courtroom
+        - kitchen
+        - rooftop-solar
+        - wind-turbine
+        - spa
+        - brain-lab
+        - observatory
+        - bio-lab
+        - ocean-research
+
+    Simulation:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        category:
+          $ref: "#/components/schemas/SimulationCategory"
+        tagline:
+          type: string
+        description:
+          type: string
+        topics:
+          type: array
+          items:
+            type: string
+        environment:
+          $ref: "#/components/schemas/EnvironmentKind"
+        available:
+          type: boolean
+      required:
+        - slug
+        - title
+        - category
+        - tagline
+        - description
+        - topics
+        - environment
+        - available
+
+    MissionChoice:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        rationale:
+          type: ["string", "null"]
+      required:
+        - id
+        - text
+
+    MissionScene:
+      type: object
+      description: Parameters that drive the 3D environment rendered for this mission.
+      properties:
+        environment:
+          $ref: "#/components/schemas/EnvironmentKind"
+        params:
+          type: object
+          additionalProperties: true
+          description: Free-form parameters specific to the environment (signage, props, highlights, numeric values, etc).
+      required:
+        - environment
+        - params
+
+    Mission:
+      type: object
+      properties:
+        id:
+          type: string
+        simulationSlug:
+          type: string
+        category:
+          $ref: "#/components/schemas/SimulationCategory"
+        topic:
+          type: string
+        difficulty:
+          type: integer
+          minimum: 1
+          maximum: 10
+        title:
+          type: string
+        roleIntro:
+          type: string
+          description: One-line setup that names the role the student is playing.
+        scenario:
+          type: string
+        problem:
+          type: string
+        constraints:
+          type: array
+          items:
+            type: string
+        question:
+          type: string
+        choices:
+          type: array
+          items:
+            $ref: "#/components/schemas/MissionChoice"
+        scene:
+          $ref: "#/components/schemas/MissionScene"
+        createdAt:
+          type: string
+      required:
+        - id
+        - simulationSlug
+        - category
+        - topic
+        - difficulty
+        - title
+        - roleIntro
+        - scenario
+        - problem
+        - constraints
+        - question
+        - choices
+        - scene
+        - createdAt
+
+    GenerateMissionBody:
+      type: object
+      properties:
+        learnerId:
+          type: string
+        simulationSlug:
+          type: string
+        targetDifficulty:
+          type: ["integer", "null"]
+          minimum: 1
+          maximum: 10
+        avoidTopics:
+          type: array
+          items:
+            type: string
+      required:
+        - learnerId
+        - simulationSlug
+
+    SubmitMissionInput:
+      type: object
+      properties:
+        learnerId:
+          type: string
+        choiceId:
+          type: string
+      required:
+        - learnerId
+        - choiceId
+
+    MissionResult:
+      type: object
+      properties:
+        missionId:
+          type: string
+        correct:
+          type: boolean
+        correctChoiceId:
+          type: string
+        explanation:
+          type: string
+        encouragement:
+          type: string
+        xpAwarded:
+          type: integer
+        newStreak:
+          type: integer
+        newLevel:
+          type: integer
+        newTotalXp:
+          type: integer
+      required:
+        - missionId
+        - correct
+        - correctChoiceId
+        - explanation
+        - encouragement
+        - xpAwarded
+        - newStreak
+        - newLevel
+        - newTotalXp
+
+    HintResponse:
+      type: object
+      properties:
+        hint:
+          type: string
+      required:
+        - hint
+
+    CategoryProgress:
+      type: object
+      properties:
+        category:
+          $ref: "#/components/schemas/SimulationCategory"
+        attempted:
+          type: integer
+        correct:
+          type: integer
+      required:
+        - category
+        - attempted
+        - correct
+
+    Progress:
+      type: object
+      properties:
+        learnerId:
+          type: string
+        totalXp:
+          type: integer
+        level:
+          type: integer
+        streak:
+          type: integer
+        bestStreak:
+          type: integer
+        missionsCompleted:
+          type: integer
+        missionsCorrect:
+          type: integer
+        accuracy:
+          type: number
+        topicsMastered:
+          type: array
+          items:
+            type: string
+        nextLevelXp:
+          type: integer
+        categoryProgress:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryProgress"
+      required:
+        - learnerId
+        - totalXp
+        - level
+        - streak
+        - bestStreak
+        - missionsCompleted
+        - missionsCorrect
+        - accuracy
+        - topicsMastered
+        - nextLevelXp
+        - categoryProgress
+
+    MissionAttempt:
+      type: object
+      properties:
+        id:
+          type: string
+        missionId:
+          type: string
+        title:
+          type: string
+        topic:
+          type: string
+        simulationSlug:
+          type: string
+        category:
+          $ref: "#/components/schemas/SimulationCategory"
+        difficulty:
+          type: integer
+        correct:
+          type: boolean
+        xpAwarded:
+          type: integer
+        attemptedAt:
+          type: string
+      required:
+        - id
+        - missionId
+        - title
+        - topic
+        - simulationSlug
+        - category
+        - difficulty
+        - correct
+        - xpAwarded
+        - attemptedAt

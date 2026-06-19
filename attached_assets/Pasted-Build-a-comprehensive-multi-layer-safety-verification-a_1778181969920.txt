@@ -1,0 +1,348 @@
+Build a comprehensive multi-layer safety, verification, and parent-notification 
+system for 1WayMirror World — a virtual platform exclusively for students in 
+grades 7-12 (ages ~12-18). The system must verify student identity, monitor 
+for predatory behavior, notify parents in real-time about contact exchanges, 
+and provide a parent dashboard for ongoing visibility.
+
+=== PART 1: USER VERIFICATION SYSTEM ===
+
+1.1 EMAIL VERIFICATION TIERS
+- Tier A (highest trust): School email verified (.k12.*, .edu, recognized district domains)
+- Tier B: Personal email + parent email verified
+- Tier C: Personal email only, no parent contact (enhanced monitoring path — see Part 6)
+- Maintain database of verified school district domains, expandable by admins
+- Block disposable email providers (integrate API like Kickbox or maintain blocklist)
+
+1.2 SIGNUP DATA COLLECTED
+- Student: full name, birthdate, grade, graduation year, school name, career interests, 
+  personal email, optional phone
+- Parent/Guardian: name, email (REQUIRED unless student selects "no parent contact available"), 
+  phone, relationship to student
+- If "no parent contact available" selected → flag account for Tier C enhanced monitoring 
+  AND prompt for school counselor email as alternate (optional but encouraged)
+
+1.3 AGE CONSISTENCY VALIDATION
+- Cross-check birthdate against claimed grade (±1 year tolerance for held-back/skipped students)
+- Re-prompt grade/age questions in different formats at days 7, 30, 90 — flag inconsistencies
+- Flag immediately if math doesn't work (e.g., 9th grader with 1995 birthdate)
+
+=== PART 2: PARENT DASHBOARD (READ-ONLY) ===
+
+Build a separate parent portal at /parent with passwordless magic-link login 
+sent to verified parent email. Dashboard displays ONLY (no platform interaction):
+
+2.1 STUDENT OVERVIEW CARD
+- Name, grade, school, graduation year
+- Career interests (top 3-5)
+- Trust badge (visual: Verified Student / Active Student / New Student / Under Review)
+- Days active on platform, total time this week/month
+
+2.2 ACTIVITY FEED
+- Time spent on platform (daily breakdown)
+- Career exploration sessions
+- Assessment/test scores and progress
+- Skill-building activities completed
+- Login locations (city-level only, e.g., "Columbus, OH area")
+
+2.3 AI CONVERSATIONS
+- Full transcripts of all conversations between student and Dario (the platform AI)
+- Searchable by date and topic
+- Flagged moments highlighted (if student expressed distress, asked about sensitive topics, etc.)
+
+2.4 REAL-TIME ALERTS SECTION
+- Contact-exchange notifications (with full context)
+- Moderation flag history
+- Login location anomalies
+- Trust score changes with explanations
+
+2.5 WEEKLY DIGEST EMAIL (in addition to real-time alerts)
+- Summary of week's activity
+- Career interests evolving
+- Notable conversations
+- Any flags or alerts from the week
+
+=== PART 3: REAL-TIME PARENT NOTIFICATIONS ===
+
+3.1 INSTANT EMAIL TRIGGERS (send immediately, no batching)
+- Any contact information exchange (phone, email, social handles, addresses)
+- Tier 2/3/4 moderation flags (see Part 5)
+- Login from unexpected country or VPN detected
+- Trust score drops below threshold
+- Student requests platform deletion or expresses distress
+
+3.2 EMAIL FORMAT FOR CONTACT EXCHANGE
+Subject: "1WayMirror Alert: [Student Name] exchanged contact info"
+Body:
+"Hi [Parent Name],
+
+Your student [Name] exchanged contact information with another user on 
+1WayMirror World today at [time].
+
+Other user: [Name], [Grade], [School] — [Verification Status]
+Their trust badge: [Badge]
+
+Conversation context (last 5 messages):
+[Excerpt with timestamps]
+
+Full conversation: [link to parent dashboard]
+
+This is a normal part of building friendships, but we want you to be aware. 
+If anything looks concerning, click here to pause [Student]'s messaging 
+or reply to this email and our team will review within 1 hour.
+
+— 1WayMirror World Safety Team"
+
+3.3 PARENT QUICK-ACTIONS FROM EMAIL
+- "Pause messaging for 24 hours" link
+- "Review full conversation" link
+- "Contact safety team" link
+
+=== PART 4: PRE-SEND CONTACT EXCHANGE WARNING ===
+
+4.1 DETECTION (run before message sends)
+The AI scans every outgoing message for:
+- Phone numbers (any format including spelled out, emojis, creative spacing)
+- Email addresses
+- Social media handles (@username, snap codes, Discord tags, etc.)
+- Platform names suggesting migration ("text me", "DM me on Insta", "add me on Snap")
+- Physical addresses
+- Meeting location suggestions
+
+4.2 WARNING MODAL (before send)
+Display in-context popup:
+"Heads up — looks like you're about to share contact info or move this 
+conversation off 1WayMirror World. 
+
+Just so you know:
+✓ Your parent will get an email about this
+✓ Your conversation will be saved for safety
+✓ You can absolutely keep talking — we just want to keep things transparent
+
+Do you want to send this message?
+[Send Anyway]  [Edit Message]  [Cancel]"
+
+4.3 POST-SEND ACTIONS
+- If sent: parent email triggered immediately
+- Logged to student profile
+- Trust score impact: minor deduction first time, larger on repeated patterns
+- Other student's parents also notified (both sides of exchange)
+
+=== PART 5: AI-POWERED MESSAGE MONITORING (TIERED) ===
+
+Use Claude API (claude-sonnet-4-5 or newer) for nuanced classification. 
+Hybrid pipeline: regex/keyword pre-filter → LLM analysis for ambiguous cases.
+
+5.1 TIER 1 — LOG ONLY (no action)
+- Mild profanity (not directed at users)
+- Off-topic chatter
+- Spam-adjacent enthusiasm
+- Casual teen language
+NO PARENT NOTIFICATION. Logged for trust score patterns only.
+
+5.2 TIER 2 — WARNING + PARENT NOTIFICATION
+Triggers:
+- Repeated contact exchange attempts after first warning
+- Profanity directed AT another user (harassment)
+- Bullying language
+- Pressuring another user to share personal info
+- Sharing OTHER people's personal information
+Action:
+- In-app warning to user
+- Email to parents of involved students
+- Trust score deduction (-10 to -20)
+- Rate limits applied for 48 hours
+
+5.3 TIER 3 — TEMPORARY SUSPENSION (24-72 HOURS) + IMMEDIATE PARENT ALERT
+Triggers:
+- Grooming language patterns (excessive flattery, secrecy requests, "don't tell anyone", isolation attempts)
+- Age inconsistency revealed in conversation ("when I was your age", "back in college")
+- Sexual content or sexualized language
+- Requests for photos (especially private/personal)
+- Financial requests or offers (money, gifts, gift cards)
+- Repeated meeting requests in physical locations
+Action:
+- Account paused immediately
+- Both users in conversation flagged for human moderator review
+- Parents of both students emailed with full context
+- Human moderator must approve reactivation
+- Trust score deduction (-50)
+
+5.4 TIER 4 — PERMANENT TERMINATION + LAW ENFORCEMENT
+Triggers:
+- Confirmed adult posing as minor (verified through investigation)
+- Sexual solicitation of a minor
+- Confirmed grooming pattern across multiple students
+- Distribution of CSAM or related content
+- Credible threats of violence
+Action:
+- Account permanently banned
+- Device fingerprint blocked
+- IP flagged
+- Report filed with NCMEC CyberTipline (legally required in US)
+- All conversations preserved for law enforcement
+- Other students contacted by this user receive safety check-in from human moderator
+- Affected parents notified with appropriate context and resources
+
+=== PART 6: TIER C ENHANCED MONITORING (NO PARENT CONTACT) ===
+
+Students without parent contact info get full platform access with these adjustments:
+- Trust score ceiling capped at 75 (vs. 100 for verified students)
+- AI moderation runs at 2x frequency on their conversations
+- Mandatory check-in with school counselor or platform admin every 30 days
+- Lower thresholds for Tier 2/3 escalation
+- Cannot be exempted from any moderation rule
+- Platform admin sees their flag history in summary view weekly
+- If counselor email provided, counselor receives notifications instead of parent
+- Visible flag in admin dashboard so human moderators know context
+
+=== PART 7: TRUST SCORE & VISUAL BADGE SYSTEM ===
+
+7.1 SCORING (0-100, calculated continuously)
++ School email verified (+30)
++ Parent verified (+20)
++ Phone verified (+10)
++ Account age >30 days, no flags (+15)
++ Consistent age/grade signals over time (+15)
++ Positive peer interactions (+10)
+- Tier 2 flag (-15)
+- Tier 3 flag (-50)
+- Failed age consistency check (-25)
+
+7.2 PUBLIC PROFILE DISPLAY
+Every user profile in 1WayMirror World shows:
+- Name (first name + last initial)
+- Career interest tags
+- Graduation year
+- Trust badge (visual, no number):
+  🟢 Verified Student (70+, school-verified)
+  🔵 Active Student (40-70, in good standing)
+  ⚪ New Student (<40, recently joined)
+  🟡 Under Review (flagged, limited visibility)
+
+7.3 FEATURE GATING BY SCORE
+- <40: read-only mode, structured prompts only, no DMs, can interact with Dario only
+- 40-70: monitored group chats, limited DMs (10/day), can post in moderated forums
+- 70+: full features (still monitored), DMs up to 100/day
+- Any tier with active flag: features auto-restricted pending review
+
+=== PART 8: LOCATION TRACKING (LIGHT TOUCH) ===
+
+8.1 TRACKED
+- Country and state/region of each login (via IP geolocation, city-level)
+- VPN/proxy detection
+- Rapid impossible location changes (Ohio → Russia in 15 min)
+
+8.2 IGNORED
+- Time-of-day patterns
+- Normal travel within reasonable range
+- Different cities within same metro area
+
+8.3 FLAGGING THRESHOLDS
+- Login from outside US: flag for review (not auto-ban)
+- VPN detected: trust score factor only, not flag
+- Login location never matches claimed school region: flag for human review
+- Rapid impossible location change: immediate session termination + parent alert
+
+8.4 PARENT DASHBOARD DISPLAY
+- Show "logged in from [City] area" — never precise location
+- Alert parent only on out-of-country or impossible-travel events
+
+=== PART 9: ADMIN MODERATION DASHBOARD ===
+
+9.1 REAL-TIME FLAG QUEUE
+- Sorted by severity (Tier 4 first, then 3, 2)
+- Color-coded by tier
+- Snooze/escalate/resolve buttons
+- Auto-refresh every 30 seconds
+
+9.2 USER INVESTIGATION VIEW
+- Full profile + verification history
+- All conversations (with search)
+- All flag history with reasoning
+- Trust score timeline graph
+- Login location history
+- Linked accounts (same device fingerprint, similar emails, etc.)
+- One-click actions: warn, mute, suspend, ban, escalate to law enforcement
+
+9.3 BULK TOOLS
+- Spam wave handling
+- Coordinated abuse detection
+- Mass-message review
+
+9.4 LEGAL/COMPLIANCE EXPORT
+- NCMEC CyberTipline report generator (for Tier 4 cases)
+- Law enforcement evidence packages
+- Audit trail for every moderation decision (who, when, why)
+
+9.5 DAILY ADMIN DIGEST
+- Tier 3/4 events summary
+- New Tier C accounts created
+- Trust score outliers
+- System health metrics
+
+=== PART 10: SAFETY-BY-DESIGN DEFAULTS ===
+
+- DMs OFF by default for new users (first 7 days)
+- All new users in "supervised mode" for first 14 days (extra moderation)
+- No file/image sharing until trust score >70 + manual approval
+- No external links posted until verified
+- Mandatory cooling-off: 24 hours between requesting and sending first DM to a new contact
+- All users see safety resources in footer: how to report, how to block, crisis hotlines
+
+=== PART 11: TECHNICAL STACK RECOMMENDATIONS ===
+
+- Backend: Node.js (Express) or Python (FastAPI)
+- Database: PostgreSQL (users, messages, flags, trust scores, audit logs)
+- Message queue: Redis or RabbitMQ for async moderation pipeline
+- AI: Claude API (claude-sonnet-4-5) for nuanced classification
+- Auth: Clerk or Auth0 with custom verification flows
+- Email: SendGrid or Postmark for parent notifications (high deliverability critical)
+- Bot protection: Cloudflare Turnstile at signup
+- Device fingerprinting: FingerprintJS
+- IP geolocation: MaxMind or IP-API
+- Parent dashboard: React with magic-link auth
+- Admin dashboard: React with role-based access control
+- Encryption: All messages encrypted at rest (AES-256), TLS in transit
+- Compliance: COPPA-compliant data handling, FERPA considerations, SOC 2 path
+
+=== PART 12: DELIVERABLES ===
+
+1. Backend API with all endpoints documented (OpenAPI spec)
+2. Database schema with migrations
+3. Async moderation pipeline service
+4. Parent dashboard (React, mobile-responsive)
+5. Admin moderation dashboard (React)
+6. Email template system (parent notifications, digests, alerts)
+7. Test suite with example messages for each Tier 1-4 risk category
+8. Documentation:
+   - Moderator handbook (how to handle each flag type)
+   - Parent onboarding guide
+   - Student safety guide
+   - Privacy policy and terms of service starter templates
+9. Monitoring dashboard for system health (flag throughput, false positive rate)
+
+=== BUILD REQUIREMENTS ===
+
+Build ALL features as a single, complete, integrated system. Do not stage 
+or phase the build. Every component listed in Parts 1-12 must be functional 
+before the system is considered complete:
+
+✓ Full verification system (Tiers A, B, C) operational
+✓ Parent dashboard live with magic-link auth
+✓ Real-time parent email notifications working end-to-end
+✓ Pre-send contact exchange warnings active on all messages
+✓ AI moderation pipeline running all 4 tiers
+✓ Trust score system calculating and displaying badges
+✓ Location tracking with anomaly detection
+✓ Admin moderation dashboard fully functional
+✓ Tier C enhanced monitoring path active
+✓ All safety-by-design defaults enforced
+✓ Test suite covering every flag tier
+✓ All documentation delivered
+
+The system is not launchable until every safety component is operational. 
+No partial deployments. No "we'll add that later." Every safeguard must be 
+in place before the first student account is created.
+
+Treat this as a safety-critical system — because it is. A platform serving 
+minors cannot launch with gaps in its protective infrastructure.

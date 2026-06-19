@@ -1,0 +1,618 @@
+Build the complete subscription pricing and Dario AI credit system for 
+1WayMirror World, a 3D virtual career exploration platform for students 
+in grades 7-12. The platform has four subscription tiers with strict 
+feature gating, a credit-based AI usage system, and Stripe payment 
+integration.
+
+================================================================
+SECTION 1: CAREER CATEGORIES (NINE TOTAL)
+================================================================
+
+The platform supports nine career categories powering simulations, 
+live streams, and content:
+
+1. Engineering
+2. Business
+3. Healthcare
+4. Trades
+5. Creative & Design
+6. Technology
+7. Law
+8. Science & Research
+9. Life & Career Advice
+
+================================================================
+SECTION 2: SUBSCRIPTION TIERS — STRICT FEATURE GATING
+================================================================
+
+CRITICAL FOR IMPLEMENTATION: Each tier has a precise list of what is 
+INCLUDED and what is EXCLUDED. Use the explicit gating tables below 
+as the source of truth. Do not interpret or extrapolate features. 
+A feature is locked at a tier unless explicitly listed as included.
+
+----------------------------------------------------------------
+TIER 1: STARTER PLAN — $19.99/month
+----------------------------------------------------------------
+Tagline: "Begin your career exploration"
+CTA: "Get Started"
+Free trial: NONE (immediate paid)
+
+INCLUDED:
+✓ Full 3D 1WayMirror World access (all 9 districts visible)
+✓ Complete video library (all videos, all categories)
+✓ 8 simulations: Engineering, Business, Healthcare, Trades, 
+  Creative & Design, Technology, Law, Science & Research
+✓ 50 Dario AI credits per month
+✓ Dario: Chat with Dario
+✓ Dario: Compare Careers
+✓ 2 random live speaker sessions per month (system-rotated, 
+  attendance only, no recordings access)
+✓ Career assessment
+✓ Parent dashboard
+
+EXPLICITLY LOCKED (show with upgrade modal):
+✗ Life & Career Advice simulation
+✗ Live stream recordings library
+✗ More than 2 live speaker sessions per month
+✗ Dario: Career Roadmap
+✗ Dario: Personality Insights
+✗ Dario: Career Report
+✗ Dario: Opportunities
+✗ Dario: Action Items
+✗ Athletic Recruiting content
+✗ College Admissions content
+✗ Human Career Advisor
+✗ AI Shadowing Finder
+
+----------------------------------------------------------------
+TIER 2: EXPLORER PLAN — $49.99/month
+----------------------------------------------------------------
+Tagline: "Find your career path"
+CTA: "Get Started — 7 Day Free Trial"
+Free trial: 7 days
+
+INCLUDED (everything in Starter, PLUS):
+✓ Life & Career Advice simulation (9th simulation unlocked)
+✓ 250 Dario AI credits per month (replaces 50)
+✓ Dario: Career Roadmap
+✓ Dario: Personality Insights
+✓ 8 live speaker sessions per month (user's choice from full schedule)
+✓ Live stream recordings library (unlimited replays)
+
+STILL LOCKED at this tier:
+✗ Dario: Career Report
+✗ Dario: Opportunities
+✗ Dario: Action Items
+✗ Athletic Recruiting content
+✗ College Admissions content
+✗ Unlimited live speaker sessions (capped at 8/month)
+✗ Human Career Advisor
+✗ AI Shadowing Finder
+
+----------------------------------------------------------------
+TIER 3: BUILDER PLAN — $99.99/month [MOST POPULAR]
+----------------------------------------------------------------
+Tagline: "Build your future seriously"
+CTA: "Get Started — 7 Day Free Trial"
+Free trial: 7 days
+Visual treatment: Highlighted card, "Most Popular" badge, 
+border accent color
+
+INCLUDED (everything in Explorer, PLUS):
+✓ 700 Dario AI credits per month (replaces 250)
+✓ Dario: Career Report
+✓ Dario: Opportunities
+✓ Unlimited live speaker sessions (replaces 8/month cap)
+✓ Athletic Recruiting live streams and resources
+✓ College Admissions live streams and resources
+
+STILL LOCKED at this tier:
+✗ Dario: Action Items
+✗ Human Career Advisor
+✗ AI Shadowing Finder
+
+----------------------------------------------------------------
+TIER 4: ACCELERATOR PLAN — $199.99/month
+----------------------------------------------------------------
+Tagline: "Personalized 1-on-1 guidance to launch your future"
+CTA: "Get Started — 7 Day Free Trial"
+Free trial: 7 days
+
+INCLUDED (everything in Builder, PLUS):
+✓ 1,250 Dario AI credits per month (replaces 700)
+✓ Dario: Action Items
+✓ Monthly 1-on-1 session with real Career Advisor (45 min, 
+  scheduled via in-app calendar)
+✓ AI Shadowing Finder
+
+ALL FEATURES UNLOCKED at this tier.
+
+================================================================
+SECTION 3: TIER COMPARISON TABLE (SOURCE OF TRUTH)
+================================================================
+
+Use this table as the master reference for ALL feature gating logic. 
+Implement a centralized permissions service that all platform features 
+query before granting access.
+
+| Feature                          | Starter | Explorer | Builder | Accelerator |
+|----------------------------------|---------|----------|---------|-------------|
+| Price (monthly)                  | $19.99  | $49.99   | $99.99  | $199.99     |
+| Price (annual)                   | $199    | $499     | $999    | $1,999      |
+| 3D World Access                  | ✓       | ✓        | ✓       | ✓           |
+| Complete Video Library           | ✓       | ✓        | ✓       | ✓           |
+| Engineering Simulation           | ✓       | ✓        | ✓       | ✓           |
+| Business Simulation              | ✓       | ✓        | ✓       | ✓           |
+| Healthcare Simulation            | ✓       | ✓        | ✓       | ✓           |
+| Trades Simulation                | ✓       | ✓        | ✓       | ✓           |
+| Creative & Design Simulation     | ✓       | ✓        | ✓       | ✓           |
+| Technology Simulation            | ✓       | ✓        | ✓       | ✓           |
+| Law Simulation                   | ✓       | ✓        | ✓       | ✓           |
+| Science & Research Simulation    | ✓       | ✓        | ✓       | ✓           |
+| Life & Career Advice Simulation  | ✗       | ✓        | ✓       | ✓           |
+| Career Assessment                | ✓       | ✓        | ✓       | ✓           |
+| Parent Dashboard                 | ✓       | ✓        | ✓       | ✓           |
+| Dario Credits per Month          | 50      | 250      | 700     | 1,250       |
+| Dario: Chat                      | ✓       | ✓        | ✓       | ✓           |
+| Dario: Compare Careers           | ✓       | ✓        | ✓       | ✓           |
+| Dario: Career Roadmap            | ✗       | ✓        | ✓       | ✓           |
+| Dario: Personality Insights      | ✗       | ✓        | ✓       | ✓           |
+| Dario: Career Report             | ✗       | ✗        | ✓       | ✓           |
+| Dario: Opportunities             | ✗       | ✗        | ✓       | ✓           |
+| Dario: Action Items              | ✗       | ✗        | ✗       | ✓           |
+| Live Speaker Sessions (per month)| 2 random| 8 chosen | Unlimited| Unlimited  |
+| Live Stream Recordings           | ✗       | ✓        | ✓       | ✓           |
+| Athletic Recruiting Content      | ✗       | ✗        | ✓       | ✓           |
+| College Admissions Content       | ✗       | ✗        | ✓       | ✓           |
+| Human Career Advisor (monthly)   | ✗       | ✗        | ✗       | ✓           |
+| AI Shadowing Finder              | ✗       | ✗        | ✗       | ✓           |
+| Free Trial                       | None    | 7 days   | 7 days  | 7 days      |
+| MOST POPULAR badge               |         |          | ✓       |             |
+
+================================================================
+SECTION 4: ANNUAL PRICING (10x MONTHLY = ~17% SAVINGS)
+================================================================
+
+Toggle on pricing page switches between monthly and annual:
+- Starter: $199/year (saves $40)
+- Explorer: $499/year (saves $100)
+- Builder: $999/year (saves $200)
+- Accelerator: $1,999/year (saves $400)
+
+Default to monthly view. Annual toggle prominently shows savings 
+("Save 17% with annual billing").
+
+================================================================
+SECTION 5: DARIO AI FEATURE DETAILS
+================================================================
+
+Dario has SEVEN features, gated by tier per Section 3 table:
+
+1. CHAT WITH DARIO
+   - Conversational AI for any career questions
+   - Available: All tiers
+   
+2. COMPARE CAREERS
+   - Side-by-side comparison of any two career paths
+   - Includes salary, required education, growth outlook, day-to-day work
+   - Available: All tiers
+
+3. CAREER ROADMAP
+   - Personalized step-by-step career plan
+   - Includes milestones, education path, skills to develop, timeline
+   - Available: Explorer, Builder, Accelerator
+
+4. PERSONALITY INSIGHTS
+   - Strengths, learning style, work style analysis
+   - Based on platform activity + direct assessment
+   - Available: Explorer, Builder, Accelerator
+
+5. CAREER REPORT
+   - Comprehensive PDF compiling all student data and analysis
+   - Shareable with parents, counselors, mentors
+   - Available: Builder, Accelerator
+
+6. OPPORTUNITIES
+   - Matched real-world opportunities (internships, programs, 
+     scholarships, shadowing, summer programs)
+   - Updates regularly based on student profile
+   - Available: Builder, Accelerator
+
+7. ACTION ITEMS
+   - Specific deadline-driven tasks with progress tracking
+   - AI generates next-step recommendations as items complete
+   - Available: Accelerator only
+
+LOCKED FEATURE BEHAVIOR:
+- All 7 features visible in Dario sidebar regardless of tier
+- Locked features displayed at 50% opacity with lock icon overlay
+- Available features displayed at full color
+- Counter badges where applicable:
+  * Career Roadmap shows credit cost (e.g., "10")
+  * Action Items shows pending task count (e.g., "8")
+- Clicking a locked feature opens upgrade modal:
+  "[Feature Name] is part of the [Tier Name] Plan. Upgrade to unlock."
+- Modal shows current tier vs. needed tier feature comparison
+- "Upgrade Now" CTA → Stripe checkout with prorated billing
+- "Maybe Later" → close modal, return to current screen
+
+================================================================
+SECTION 6: DEDICATED DARIO PAGE ON WEBSITE
+================================================================
+
+Build a marketing page at /dario showcasing the AI advisor:
+
+PAGE STRUCTURE:
+
+Hero section:
+- Headline: "Meet Dario — Your AI Career Advisor"
+- Subheadline: "Your personal guide through career exploration, planning, 
+  and execution"
+- Hero animation/visual showing Dario interface
+- CTA: "See Pricing"
+
+Feature showcase (one section per Dario feature):
+- Each feature gets its own section with:
+  * Feature name and icon (matching sidebar style)
+  * Description of what it does
+  * Visual mockup/screenshot of the feature in action
+  * Which tiers include it (clear badge: "Available in Explorer+")
+  * Example output or use case
+
+Order on page (matches journey):
+1. Chat with Dario — "Ask anything about careers"
+2. Compare Careers — "See two paths side by side"
+3. Career Roadmap — "Get your personalized plan"
+4. Personality Insights — "Discover your strengths"
+5. Career Report — "Comprehensive analysis"
+6. Opportunities — "Find real-world matches"
+7. Action Items — "Take concrete next steps"
+
+How It Works section:
+- Brief explanation of credit system
+- "How credits work" with visual examples
+- Reassurance that Chat is always available across all tiers
+
+Pricing snapshot:
+- Mini version of pricing tiers focused on Dario features
+- "See full pricing" link to /pricing
+
+FAQ section:
+- "What can Dario help me with?"
+- "How do credits work?"
+- "What's the difference between Dario and a human advisor?"
+- "Is my conversation with Dario private?" (parent dashboard visibility)
+- "What if I run out of credits?"
+
+Footer CTA:
+- "Ready to start exploring?"
+- Buttons: "Start with $19.99" / "Try Builder Free for 7 Days"
+
+================================================================
+SECTION 7: DARIO CREDIT SYSTEM
+================================================================
+
+CREDIT ALLOCATION (refreshes monthly on subscription billing date):
+- Starter: 50 credits
+- Explorer: 250 credits
+- Builder: 700 credits
+- Accelerator: 1,250 credits
+
+CREDIT COSTS PER ACTION:
+
+Chat with Dario:
+- Short response (under 50 words): 1 credit
+- Medium response (50-200 words): 2 credits
+- Long response (200-500 words): 3 credits
+
+Compare Careers:
+- Single comparison: 3 credits
+
+Career Roadmap (Explorer+):
+- Generate new roadmap: 10 credits
+- Update existing roadmap: 5 credits
+- View existing roadmap: free
+
+Personality Insights (Explorer+):
+- Generate full insights report: 8 credits
+- Quick personality check-in: 2 credits
+- View existing insights: free
+
+Career Report (Builder+):
+- Generate full Career Report PDF: 15 credits
+- Regenerate or update: 10 credits
+- View existing report: free
+
+Opportunities (Builder+):
+- Refresh matched opportunities: 5 credits
+- View opportunity detail: 1 credit per detailed view
+- Default opportunities feed loads free (cached)
+
+Action Items (Accelerator):
+- Generate new action items list: 10 credits
+- Mark items complete or update progress: free
+- AI-suggested next actions when completing items: 2 credits each
+
+CREDIT BEHAVIOR:
+- No rollover month-to-month (use it or lose it)
+- Refresh on subscription billing anniversary date
+- Daily cron job checks billing_period_end <= now and resets credits
+- Display credit balance in Dario chat: "🎟️ 247 credits"
+- 25% credits remaining: gentle in-app notification
+- 10% credits remaining: prominent warning + upgrade prompt
+- 0 credits: lock Dario chat, show refresh date and upgrade CTA
+
+================================================================
+SECTION 8: LIVE SPEAKER SESSION GATING
+================================================================
+
+Caps per tier:
+- Starter: 2 sessions per month, system-assigned random rotation, 
+  attendance only, no recordings access
+- Explorer: 8 sessions per month, user's choice from full schedule
+- Builder: Unlimited live sessions
+- Accelerator: Unlimited live sessions
+
+Recording access:
+- Starter: No recordings access (locked)
+- Explorer/Builder/Accelerator: Unlimited recordings library access
+
+Database tracking:
+live_session_attendance table:
+- user_id (FK)
+- session_id (FK)
+- attended_at (timestamp)
+- billing_period (string YYYY-MM format)
+- is_recording (boolean)
+
+Cap counting logic:
+- Count attended_at events in current billing_period where 
+  is_recording = false
+- Block new live attendance when count >= tier limit
+- Recordings (is_recording = true) never count against cap
+
+================================================================
+SECTION 9: DATABASE SCHEMA
+================================================================
+
+subscriptions table:
+- id (UUID, primary key)
+- user_id (FK to users)
+- stripe_subscription_id (string)
+- stripe_customer_id (string)
+- tier (enum: starter, explorer, builder, accelerator)
+- billing_cycle (enum: monthly, annual)
+- status (enum: active, trialing, past_due, canceled, incomplete)
+- current_period_start (timestamp)
+- current_period_end (timestamp)
+- trial_end (timestamp, nullable)
+- cancel_at_period_end (boolean)
+- created_at (timestamp)
+- updated_at (timestamp)
+
+dario_credits table:
+- user_id (FK, primary key)
+- subscription_tier (enum)
+- monthly_allocation (integer)
+- credits_remaining (integer)
+- credits_used_this_period (integer)
+- billing_period_start (timestamp)
+- billing_period_end (timestamp)
+- last_updated (timestamp)
+
+dario_credit_transactions table:
+- id (UUID, primary key)
+- user_id (FK)
+- timestamp
+- interaction_type (enum: chat_short, chat_medium, chat_long, compare, 
+  roadmap_generate, roadmap_update, personality_full, personality_quick, 
+  report_generate, report_update, opportunities_refresh, opportunity_view, 
+  action_items_generate, action_items_suggest)
+- credits_consumed (integer)
+- response_length_words (integer, nullable)
+- credits_remaining_after (integer)
+- conversation_context_id (FK, nullable)
+
+dario_artifacts table (stores generated content for free re-viewing):
+- id (UUID, primary key)
+- user_id (FK)
+- artifact_type (enum: roadmap, personality_insights, career_report, 
+  opportunities, action_items)
+- content (JSONB)
+- generated_at (timestamp)
+- last_updated (timestamp)
+- credits_consumed (integer)
+
+action_items table (Accelerator tier):
+- id (UUID, primary key)
+- user_id (FK)
+- title (string)
+- description (text)
+- due_date (timestamp, nullable)
+- priority (enum: low, medium, high)
+- status (enum: pending, in_progress, completed, dismissed)
+- created_at (timestamp)
+- completed_at (timestamp, nullable)
+- ai_generated (boolean)
+
+================================================================
+SECTION 10: STRIPE INTEGRATION
+================================================================
+
+REQUIRED STRIPE PRODUCTS:
+- Starter Monthly ($19.99) — no trial
+- Starter Annual ($199) — no trial
+- Explorer Monthly ($49.99) — 7-day trial
+- Explorer Annual ($499) — 7-day trial
+- Builder Monthly ($99.99) — 7-day trial
+- Builder Annual ($999) — 7-day trial
+- Accelerator Monthly ($199.99) — 7-day trial
+- Accelerator Annual ($1,999) — 7-day trial
+
+WEBHOOK HANDLERS REQUIRED:
+
+subscription.created:
+- Activate user's tier in subscriptions table
+- Create dario_credits row with monthly_allocation per tier
+- Unlock features per tier
+- Send welcome email with tier-specific onboarding
+
+subscription.updated:
+- Detect tier change (upgrade or downgrade)
+- Upgrade: prorate new credits immediately, unlock features
+- Downgrade: schedule change for next billing cycle, retain current 
+  credits until period end
+- Update subscriptions table
+
+subscription.deleted (cancellation):
+- Mark cancel_at_period_end = true
+- Access continues until current_period_end
+- After period ends, lock features and remove credit allocation
+- Preserve user data for 90 days, then anonymize
+
+invoice.payment_failed:
+- Mark subscription status = past_due
+- Begin grace period (3 retries over 7 days)
+- Send notification email + SMS
+- After grace period, downgrade to no-access state
+
+customer.subscription.trial_will_end:
+- Send conversion reminder 3 days before trial end
+- Send final reminder 1 day before
+- Auto-convert to paid unless canceled
+
+================================================================
+SECTION 11: UPGRADE/DOWNGRADE FLOWS
+================================================================
+
+UPGRADE FLOW:
+- One-click via Stripe with prorated billing
+- New credits added immediately (prorated to days remaining in period)
+- New features unlocked immediately
+- New content accessible immediately
+- Confirmation email + in-app notification
+- Show "What's New" tour highlighting newly unlocked features
+
+DOWNGRADE FLOW:
+- Takes effect at next billing cycle (no immediate access removal)
+- Existing credits remain available until period ends
+- Confirmation: "Your plan will change to [Tier] on [date]. You'll keep 
+  your current features until then."
+- User can reverse downgrade anytime before period ends
+
+CANCELLATION FLOW:
+- "Are you sure?" modal with retention offer (e.g., 50% off next month)
+- Access continues until billing period ends
+- Confirmation email with cancellation date and reactivation instructions
+- Data preserved for 90 days
+- After 90 days, account anonymized
+
+================================================================
+SECTION 12: PRICING PAGE LAYOUT
+================================================================
+
+PAGE STRUCTURE:
+
+Hero section:
+- Headline: "Choose Your Career Exploration Plan"
+- Subheadline: "All plans include full safety monitoring and parent 
+  dashboard"
+- Monthly/Annual toggle (default Monthly, prominent annual savings badge)
+
+Tier cards (4 horizontal on desktop, stacked on mobile):
+- Each card: tier name, tagline, large price display, feature checklist, 
+  CTA button
+- BUILDER card visually highlighted as MOST POPULAR with badge
+- Builder card has accent border/elevated visual treatment
+- Builder card may be slightly larger or have a colored top accent
+- Use blue color scheme matching existing brand
+- Smooth hover effects on cards
+- Card heights match across tiers (use min-height)
+
+Feature comparison section (below tier cards):
+- "Compare All Features" expandable matrix
+- Full feature breakdown across all 4 tiers (use Section 3 table)
+- Visual checkmarks/X marks for clarity
+- Categories: Platform Access, Dario AI, Live Streams, Content Library, 
+  Career Tools, Premium Services
+
+FAQ section:
+- "Can I cancel anytime?" — Yes, anytime, access until period ends
+- "What happens during the free trial?" — Full access for 7 days, 
+  cancel anytime to avoid charge
+- "Can I switch plans?" — Yes, upgrade or downgrade anytime
+- "Is my child's data safe?" — Full safety monitoring, COPPA compliant
+- "What does Dario do?" — Brief explanation + link to /dario page
+- "What are credits?" — Brief explanation of usage system
+
+Trust indicators (footer of pricing page):
+- "Cancel anytime"
+- "Safe and monitored"
+- "COPPA compliant"
+- "7-day free trial on Explorer, Builder, and Accelerator"
+
+For Schools link:
+- Subtle link at bottom: "Looking for school district pricing? Contact 
+  our enterprise team"
+- Routes to contact form, not pricing page
+
+================================================================
+SECTION 13: ADMIN CONTROLS
+================================================================
+
+Admin dashboard for subscription management:
+- View all subscribers with tier, status, credits remaining, billing date
+- Manually adjust credits (customer service tool)
+- Manually upgrade/downgrade users (with audit log)
+- View revenue dashboard (MRR, churn, conversion rates)
+- View tier conversion funnel (Starter → Explorer → Builder → Accelerator)
+- Issue refunds via Stripe
+- Pause/resume subscriptions
+- Send custom notifications to specific tier groups
+
+Audit log for all admin actions:
+- Admin user ID
+- Action taken
+- Target user
+- Timestamp
+- Reason (required field)
+
+================================================================
+SECTION 14: ANALYTICS & METRICS
+================================================================
+
+Track for business intelligence:
+- Conversion rate per tier (free trial → paid)
+- Tier upgrade frequency (Starter → Explorer, etc.)
+- Churn rate per tier
+- Credit consumption patterns per tier
+- Feature usage by tier (which Dario features get used most)
+- Revenue per user (ARPU) by tier
+- Lifetime value (LTV) by tier
+- Cancellation reasons (collected at cancel flow)
+
+================================================================
+SECTION 15: EMAIL TEMPLATES
+================================================================
+
+Build these transactional emails:
+1. Welcome email (per tier) — onboarding, what's included, how to start
+2. Trial started email — trial end date, what to expect
+3. Trial ending soon email (3 days before, 1 day before)
+4. Trial converted to paid email
+5. Payment receipt email
+6. Payment failed email (with action required)
+7. Subscription upgraded email (welcome to new tier)
+8. Subscription downgraded email (changes taking effect)
+9. Cancellation confirmation email
+10. Win-back email (sent 30 days after cancellation)
+11. Credit refresh notification (start of billing period)
+12. Low credits warning (25% remaining)
+13. Out of credits notification (0% remaining)
+14. Annual renewal reminder (30 days before)
+
+================================================================
+SECTION 16: MOBILE RESPONSIVENESS
+================================================================
+
+All pricing and Dario inter

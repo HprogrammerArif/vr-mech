@@ -1,0 +1,750 @@
+Build a full 1WayMirror Career Simulation Platform using immersive 3D/VR-style missions.
+
+This should not be a quiz platform. Do not use a fixed Question 1, Question 2, Question 3 structure. These should feel like interactive career missions where students solve realistic problems through choices, tools, sliders, drag-and-drop, voice, object interaction, and AI-generated events.
+
+Branding:
+
+Platform name: 1WayMirror
+Dark navy background
+Gold/orange accents
+Clean white text
+Modern, immersive, high-school-friendly feel
+CTA: Start Mission
+
+Core requirements:
+
+Every career topic must have a 3D/VR-style interactive environment
+Use WebGL/Three.js or similar browser-based 3D
+Add “Enter VR” where supported, but also make everything work on laptops
+AI generates never-ending missions
+Progress is tracked across all categories
+Track XP, level, streak, mission history, skill strengths, weak areas, badges, and completion rate
+Missions must adapt based on performance
+Keep all content fun, realistic, high school appropriate, and challenging but not overwhelming
+Avoid PhD-level technical depth
+After each mission, automatically generate a new one
+
+Mission engine should include:
+
+Career environment
+Real-world problem
+Interactive tools
+AI-generated obstacles
+Budget/time/safety/customer constraints
+Multiple possible solutions
+Performance score
+Feedback based on choices
+Suggested next mission
+Skill map update
+Main Career Categories and Topics
+Engineering
+Mechanical Engineering
+
+Build missions around:
+
+Product testing lab
+Robotic arm overheating
+Simple machines
+Levers
+Pulleys
+Ramps and friction
+Gears and torque
+Forces and motion
+Product design failure
+Energy efficiency
+Manufacturing tradeoffs
+Thermal systems
+Mechanical safety testing
+Material selection
+Prototype improvement
+Civil Engineering
+
+Build missions around:
+
+Bridge design
+Roadway planning
+Building foundations
+Structural loads
+Stormwater drainage
+Construction materials
+Earthquake resistance
+Wind resistance
+Traffic flow
+Infrastructure repair
+Public safety
+Flood prevention
+City planning
+Construction site constraints
+Electrical Engineering
+
+Build missions around:
+
+Basic circuits
+Voltage
+Current
+Resistance
+Power systems
+Sensors
+Battery-powered devices
+Circuit troubleshooting
+Renewable energy systems
+Signal flow
+Electrical safety
+Smart devices
+Device wiring
+Power efficiency
+Chemical Engineering
+
+Build missions around:
+
+Mixing systems
+Heat transfer
+Product consistency
+Chemical plant safety
+Filtration
+Scaling lab processes
+Quality control
+Clean water systems
+Food production
+Cosmetic production
+Environmental impact
+Process efficiency
+Contamination prevention
+Aerospace Engineering
+
+Build missions around:
+
+Lift and drag
+Rocket stability
+Aircraft wing design
+Weight reduction
+Fuel efficiency
+Flight testing
+Spacecraft heat protection
+Materials selection
+Launch constraints
+Mission planning
+Wind tunnel testing
+Payload tradeoffs
+Safety checks
+Biomedical Engineering
+
+Build missions around:
+
+Prosthetic design
+Medical device testing
+Biomechanics
+Patient safety
+Wearable health sensors
+Device comfort
+Hospital equipment design
+Imaging technology
+Assistive technology
+Human-centered design
+Device failure prevention
+Accessibility design
+Industrial Engineering
+
+Build missions around:
+
+Factory workflow
+Process improvement
+Reducing waste
+Scheduling
+Supply chain basics
+Ergonomics
+Quality control
+Bottlenecks
+Cost vs. efficiency
+Safety improvements
+Warehouse layout
+Production delays
+Lean systems
+Environmental Engineering
+
+Build missions around:
+
+Clean water systems
+Air quality
+Waste management
+Recycling systems
+Pollution control
+Flood prevention
+Sustainable materials
+Environmental testing
+Community impact
+Climate resilience
+Water treatment
+Storm response
+Emissions reduction
+Software Engineering
+
+Build missions around:
+
+Debugging
+User experience problems
+Feature prioritization
+AI feature misbehavior
+Automation gone wrong
+Memory leaks
+Misleading metrics
+Security basics
+App performance
+Team communication
+Release decisions
+Bug triage
+Product tradeoffs
+Business
+Entrepreneurship
+
+Build missions around:
+
+Startup idea testing
+Business model design
+Target audience selection
+Pricing
+Marketing channels
+Customer discovery
+Product-market fit
+Startup budgeting
+Pitching
+Hiring early team members
+Scaling responsibly
+Customer feedback
+Revenue model decisions
+Marketing
+
+Build missions around:
+
+Social media strategy
+Ad creative testing
+Brand positioning
+Audience segmentation
+Campaign planning
+Influencer partnerships
+Engagement growth
+Digital sales funnels
+Email marketing
+Measuring ROI
+TikTok/Instagram/Facebook/LinkedIn campaigns
+Content calendar decisions
+Brand voice
+Finance / Investing
+
+Build missions around:
+
+Client risk profile
+Portfolio choices
+Diversification
+Market volatility
+Long-term goals
+Short-term goals
+Stock research
+Ethical financial advice
+Budgeting
+Investment tradeoffs
+Explaining risk clearly
+Client communication
+Rebalancing decisions
+Accounting
+
+Build missions around:
+
+Profit and loss
+Cash flow
+Expense tracking
+Break-even analysis
+Budget variance
+Fraud red flags
+Tax basics
+Internal controls
+Financial reporting
+Business decision support
+Revenue vs. profit
+Expense reduction
+Financial accuracy
+Management
+
+Build missions around:
+
+Team leadership
+Conflict resolution
+Hiring decisions
+Delegation
+Performance feedback
+Operations planning
+Customer service issues
+Workplace culture
+Ethical decisions
+Strategic tradeoffs
+Team morale
+Crisis response
+Goal setting
+Sales
+
+Build missions around:
+
+Discovery calls
+Handling objections
+Building trust
+Closing deals
+Follow-up strategy
+Customer needs
+Relationship selling
+Ethical persuasion
+CRM tracking
+Long-term account growth
+Cold outreach
+Negotiation
+Customer retention
+Healthcare
+Nursing
+
+Build missions around:
+
+Patient triage
+Vital signs
+Medication safety
+Patient communication
+Team handoffs
+Infection control
+Family concerns
+Emergency prioritization
+Charting basics
+Compassion under pressure
+Hospital workflow
+Patient monitoring
+Physician
+
+Build missions around:
+
+Diagnosing common symptoms
+Asking patient questions
+Interpreting basic information
+Care planning
+Referral decisions
+Patient communication
+Preventive care
+Ethical dilemmas
+Team-based care
+Emergency judgment
+Prioritizing patient concerns
+Physician Assistant
+
+Build missions around:
+
+Patient intake
+Follow-up care
+Treatment planning
+Escalating concerns
+Explaining medical instructions
+Coordinating with physicians
+Clinical judgment
+Patient education
+Time management
+Urgent care scenarios
+Rural care scenarios
+Pharmacist
+
+Build missions around:
+
+Medication review
+Drug interaction warnings
+Patient counseling
+Dosage clarification
+Insurance challenges
+Pharmacy workflow
+Safety checks
+Vaccine questions
+Chronic condition support
+Communication with providers
+Prescription accuracy
+Physical Therapist
+
+Build missions around:
+
+Injury assessment
+Rehab planning
+Patient motivation
+Exercise progression
+Mobility challenges
+Pain communication
+Recovery setbacks
+Sports injury scenarios
+Elderly patient support
+Measuring progress
+Home exercise plans
+Radiologist
+
+Build missions around:
+
+Imaging clues
+Prioritizing urgent scans
+Communicating findings
+Pattern recognition
+Patient safety
+Imaging technology basics
+Team collaboration
+Avoiding missed details
+Emergency imaging
+Ethical reporting
+Scan workflow
+Dentist
+
+Build missions around:
+
+Cavity prevention
+Patient anxiety
+Treatment planning
+Oral health education
+X-ray basics
+Infection control
+Emergency dental pain
+Cosmetic vs. health decisions
+Child patient communication
+Practice workflow
+Preventive care
+Veterinarian
+
+Build missions around:
+
+Animal symptoms
+Owner communication
+Basic exam priorities
+Emergency animal care
+Vaccination questions
+Nutrition guidance
+Surgery preparation
+Ethical treatment decisions
+Animal behavior
+Clinic workflow
+Pet safety
+Psychologist
+
+Build missions around:
+
+Listening skills
+Asking supportive questions
+Stress management
+School-related concerns
+Ethical boundaries
+Referral decisions
+Building trust
+Crisis escalation
+Family communication
+Progress tracking
+Treatment planning basics
+Speech-Language Pathologist
+
+Build missions around:
+
+Speech development
+Communication barriers
+Student support
+Therapy planning
+Parent communication
+School collaboration
+Progress tracking
+Social communication
+Swallowing safety basics
+Assistive communication tools
+Medical and Health Services Manager
+
+Build missions around:
+
+Hospital operations
+Staff scheduling
+Patient flow
+Budget decisions
+Quality improvement
+Compliance
+Communication between departments
+Resource shortages
+Patient satisfaction
+Emergency planning
+Trades
+Electrician
+
+Build missions around:
+
+Wiring problems
+Circuit safety
+Breaker panels
+Reading basic diagrams
+Troubleshooting outlets
+Lighting installation
+Load management
+Safety inspections
+Customer communication
+Code awareness
+Plumber
+
+Build missions around:
+
+Pipe leaks
+Water pressure
+Drain clogs
+Fixture installation
+Reading layouts
+Emergency repairs
+Customer estimates
+Safety and sanitation
+Water heater basics
+Preventing damage
+HVAC Technician
+
+Build missions around:
+
+Heating issues
+Cooling issues
+Airflow problems
+Thermostat troubleshooting
+Filter systems
+Refrigerant basics
+Energy efficiency
+Customer communication
+Seasonal maintenance
+System diagnostics
+Carpenter
+
+Build missions around:
+
+Measuring and cutting
+Framing
+Material selection
+Reading plans
+Tool safety
+Repair decisions
+Structural support
+Customer requests
+Cost estimation
+Build accuracy
+Construction Equipment Operator
+
+Build missions around:
+
+Site safety
+Equipment positioning
+Digging strategy
+Load movement
+Communication with crews
+Terrain challenges
+Weather delays
+Fuel efficiency
+Hazard awareness
+Project timing
+Solar Photovoltaic Installer
+
+Build missions around:
+
+Panel placement
+Roof safety
+Sun angle
+Wiring basics
+Customer energy goals
+Installation planning
+Weather constraints
+Efficiency estimates
+Maintenance
+Safety checks
+Wind Turbine Technician
+
+Build missions around:
+
+Turbine inspection
+Climbing safety
+Mechanical troubleshooting
+Electrical troubleshooting
+Weather conditions
+Preventive maintenance
+Emergency shutdowns
+Tool selection
+Team communication
+Repair planning
+Industrial Maintenance Technician
+
+Build missions around:
+
+Machine breakdowns
+Preventive maintenance
+Sensors and controls
+Conveyor systems
+Safety lockout
+Troubleshooting sequence
+Production downtime
+Parts replacement
+Team communication
+Factory efficiency
+Culinary Chef
+
+Build missions around:
+
+Kitchen timing
+Menu planning
+Ingredient substitution
+Food safety
+Customer complaints
+Cost control
+Plating
+Team coordination
+Inventory
+Rush-hour pressure
+Esthetician
+
+Build missions around:
+
+Skin assessment
+Client consultation
+Treatment selection
+Product safety
+Sanitation
+Customer comfort
+Allergic reaction prevention
+Business professionalism
+Client retention
+Ethical recommendations
+Technology
+Artificial Intelligence
+
+Build missions around:
+
+AI chatbot behavior
+Prompt testing
+Bias detection
+AI feature misbehavior
+Automation mistakes
+Human review
+Training data quality
+Safety guardrails
+Customer trust
+Product usefulness
+Cybersecurity
+
+Build missions around:
+
+Phishing detection
+Password security
+Suspicious logins
+Data protection
+Incident response
+Social engineering
+Network basics
+Risk assessment
+Security awareness
+Protecting users
+Information Technology
+
+Build missions around:
+
+Help desk tickets
+Device setup
+Network troubleshooting
+Account access
+Cloud tools
+Software updates
+User support
+System reliability
+Escalation decisions
+Documentation
+Data Analyst
+
+Build missions around:
+
+Reading dashboards
+Finding patterns
+Misleading metrics
+Cleaning data
+Explaining insights
+Business recommendations
+Chart selection
+Data errors
+Customer behavior
+Decision support
+Quantum Computing
+
+Build missions around:
+
+Explaining quantum concepts simply
+Choosing practical use cases
+Comparing classical vs. quantum
+Error challenges
+Research decisions
+Startup strategy
+Quantum security basics
+Simulation use cases
+Hardware limitations
+Future applications
+SaaS Product Builder
+
+Build missions around:
+
+Product features
+User feedback
+Subscription pricing
+Onboarding
+Churn reduction
+Feature prioritization
+Customer support
+Growth strategy
+Product analytics
+Bug fixes
+UX/UI Designer
+
+Build missions around:
+
+User flow
+Accessibility
+Layout decisions
+App frustration points
+Design testing
+Mobile usability
+Visual hierarchy
+User feedback
+Conversion improvement
+Prototype choices
+Cloud / DevOps
+
+Build missions around:
+
+Server reliability
+Scaling traffic
+Deployment issues
+Cloud cost control
+Monitoring alerts
+Backup planning
+System outages
+Performance bottlenecks
+Security settings
+Incident response
+Law
+Lawyer / Courtroom Witness Challenge
+
+Build missions around:
+
+Student plays the lawyer
+AI witness responds naturally
+AI opposing lawyer objects
+Student questions the witness by voice
+Student must find contradictions
+Student builds a case through strong questioning
+Student decides when to challenge, clarify, or move on
+AI scores question quality, professionalism, evidence use, and logic
+Include courtroom 3D environment
+Include future voice-to-text and text-to-speech support
+
+Law mission topics:
+
+Witness questioning
+Cross-examination
+Opening statement strategy
+Objection handling
+Evidence review
+Contract dispute
+Business law scenario
+Criminal defense basics
+Civil case basics
+Client interview
+Negotiation
+Ethics
+Legal research
+Mediation

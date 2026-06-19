@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "MechVR Lab"
+version = "1.0.0"
+id = "artifacts/mech-vr-lab"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22303
+
+[services.development]
+run = "pnpm --filter @workspace/mech-vr-lab run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mech-vr-lab", "run", "build" ]
+publicDir = "artifacts/mech-vr-lab/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22303"
+BASE_PATH = "/"
