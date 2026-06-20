@@ -8,6 +8,7 @@ import HomePage from "@/pages/HomePage";
 import NotFound from "@/pages/not-found";
 import { queryClient } from "@/lib/queryClient";
 import { getProfile } from "@/lib/profile";
+import { fetchCurrentSession } from "@/lib/auth";
 
 const SimulationPage   = lazy(() => import("@/pages/SimulationPage"));
 const CityPage         = lazy(() => import("@/pages/CityPage"));
@@ -63,6 +64,10 @@ function Router() {
   const [location] = useLocation();
   const isFullscreen = FULLSCREEN_ROUTES.has(location) || FULLSCREEN_PREFIXES.some(p => location.startsWith(p));
   useHeartbeat();
+
+  useEffect(() => {
+    fetchCurrentSession().catch(() => {});
+  }, []);
 
   return (
     <>

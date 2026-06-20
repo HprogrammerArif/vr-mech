@@ -4,6 +4,7 @@ import { pgTable, text, integer, boolean, timestamp, jsonb, serial, uniqueIndex 
 export const safetyAccountsTable = pgTable("safety_accounts", {
   id: text("id").primaryKey(),
   learnerId: text("learner_id").notNull(),
+  userId: text("user_id").notNull(),
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
   birthdate: text("birthdate"),
@@ -34,6 +35,7 @@ export type InsertSafetyAccount = typeof safetyAccountsTable.$inferInsert;
 export const parentAccountsTable = pgTable("parent_accounts", {
   id: text("id").primaryKey(),
   studentId: text("student_id").notNull(),
+  userId: text("user_id").notNull(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone: text("phone"),
@@ -53,6 +55,7 @@ export type InsertParentAccount = typeof parentAccountsTable.$inferInsert;
 export const trustScoresTable = pgTable("trust_scores", {
   id: serial("id").primaryKey(),
   studentId: text("student_id").notNull().unique(),
+  userId: text("user_id").notNull(),
   score: integer("score").notNull().default(25),
   tier: text("tier").notNull().default("C"),
   schoolEmailVerified: boolean("school_email_verified").notNull().default(false),

@@ -7,15 +7,10 @@ import {
   isDisposableEmail, isSchoolEmail, validateAgeGradeConsistency,
   saveSafetyProfile, calculateTrustScore, getTrustBadge,
 } from "@/lib/safety";
+import { CAREER_INTERESTS } from "@/constant";
 
 const BASE = import.meta.env.BASE_URL ?? "/";
 
-const CAREER_INTERESTS = [
-  "Engineering", "Technology / Software", "Healthcare / Medicine",
-  "Business / Finance", "Skilled Trades", "Law & Public Service",
-  "Science & Research", "Creative & Design", "Entrepreneurship",
-  "Education", "Not sure yet — exploring!",
-];
 
 const GRADES = [7, 8, 9, 10, 11, 12];
 
@@ -125,23 +120,42 @@ export default function LoginPage() {
     await new Promise(r => setTimeout(r, 400));
 
     if (mode === "register") {
-      const learnerId = getOrCreateLearnerId();
-      const result = await registerAccount(name.trim(), email.trim(), password, learnerId);
-      if (!result.ok) { setError(result.error ?? "Registration failed."); setLoading(false); return; }
-
-      signIn(name.trim(), email.trim().toLowerCase());
-      saveProfile({
-        learnerId,
+      const result = await registerAccount({
         name: name.trim(),
         email: email.trim().toLowerCase(),
+        password,
+        careerInterests,
+        grade: parseInt(grade),
+        birthdate,
+        graduationYear: graduationYear ? parseInt(graduationYear, 10) : undefined,
+        schoolName: schoolName.trim(),
+        schoolEmail: schoolEmail.trim() || undefined,
+        parentName: parentName.trim() || undefined,
+        parentEmail: parentEmail.trim() || undefined,
+        parentPhone: parentPhone.trim() || undefined,
+        noParentContact,
+        counselorEmail: counselorEmail.trim() || undefined,
+      });
+
+      if (!result.ok || !result.user) {
+        setError(result.error ?? "Registration failed.");
+        setLoading(false);
+        return;
+      }
+
+      // Sync standard localStorage profiles so current client remains functional
+      signIn(result.user);
+      saveProfile({
+        learnerId: result.user.id,
+        name: result.user.name,
+        email: result.user.email,
         careerInterest: careerInterests[0] || "",
         careerInterests,
         avatarId: "nova",
-        school: schoolName || undefined,
+        school: schoolName.trim() || undefined,
         graduationYear: graduationYear ? parseInt(graduationYear, 10) : undefined,
       });
 
-      /* Compute local safety profile */
       const schoolVerified = isSchoolEmail(schoolEmail || email);
       const parentVerified = !noParentContact && !!parentEmail;
       const score = calculateTrustScore({
@@ -157,7 +171,7 @@ export default function LoginPage() {
       });
 
       saveSafetyProfile({
-        studentId: learnerId,
+        studentId: result.user.id,
         verificationTier: schoolVerified ? "A" : parentVerified ? "B" : "C",
         trustScore: score,
         trustBadge: getTrustBadge(score),
@@ -174,43 +188,24 @@ export default function LoginPage() {
         schoolName: schoolName || undefined,
       });
 
-      /* Register with API (non-blocking) */
-      void fetch("/api/safety/register", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          learnerId, email: email.trim(), name: name.trim(),
-          birthdate, grade: grade ? parseInt(grade, 10) : undefined,
-          graduationYear: graduationYear ? parseInt(graduationYear, 10) : undefined,
-          schoolName, schoolEmail,
-          careerInterests,
-          parentName, parentEmail, parentPhone, parentRelationship: "parent",
-          noParentContact, counselorEmail,
-        }),
-      }).catch(() => { /* noop — local profile already saved */ });
-
       setLoading(false);
       navigate("/my-profile");
     } else {
-      const account = await verifyAccount(email.trim(), password);
-      if (!account) {
-        const existing = getProfile();
-        if (existing?.email === email.trim().toLowerCase()) {
-          signIn(existing.name, existing.email);
-          setLoading(false);
-          navigate("/replitopolis");
-          return;
-        }
+      const user = await verifyAccount(email.trim(), password);
+      console.log(user)
+      if (!user) {
         setError("Invalid email or password. Don't have an account? Sign up above.");
         setLoading(false);
         return;
       }
-      signIn(account.name, account.email);
-      const learnerId = getOrCreateLearnerId();
+
+      // Sync profile state
+      signIn(user);
       const existing = getProfile();
       saveProfile({
-        learnerId: account.learnerId ?? learnerId,
-        name: account.name,
-        email: account.email,
+        learnerId: user.id,
+        name: user.name,
+        email: user.email,
         careerInterest: existing?.careerInterest ?? "",
         avatarId: existing?.avatarId ?? "nova",
         school: existing?.school,
@@ -218,8 +213,13 @@ export default function LoginPage() {
         gpa: existing?.gpa,
         sat: existing?.sat,
       });
+
       setLoading(false);
-      navigate("/replitopolis");
+      if (user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/replitopolis");
+      }
     }
   };
 

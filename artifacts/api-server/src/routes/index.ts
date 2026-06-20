@@ -7,6 +7,7 @@ import npcRouter from "./npc";
 import darioRouter from "./dario";
 import safetyRouter from "./safety";
 import uploadRouter from "./upload";
+import authRouter from "./auth";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(npcRouter);
 router.use(darioRouter);
 router.use("/safety", safetyRouter);
 router.use("/admin", uploadRouter);
+router.use("/auth", authRouter);
 
 export default router;
