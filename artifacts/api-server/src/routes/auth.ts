@@ -9,21 +9,60 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || "fallback-super-secret-key-32-chars-long";
 
-// Helper to sign JWT and set cookie
-function setAuthCookie(res: any, userId: string) {
-  const token = jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: "7d" });
+const JWT_SECRET         = process.env.JWT_SECRET         || "fallback-access-secret-min-32-chars!!";
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "fallback-refresh-secret-min-64-chars-long!!";
 
-  res.cookie("auth_token", token, {
-    httpOnly: true, // Safeguard against XSS
-    secure: process.env.NODE_ENV === "production", // HTTPS only in production
-    sameSite: "lax", // Protect against CSRF
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+const ACCESS_EXPIRES_SECS  = 15 * 60;           // 15 minutes
+const REFRESH_EXPIRES_SECS = 7 * 24 * 60 * 60;  // 7 days
+
+// ── Token helpers ──────────────────────────────────────────────────────────
+
+function signAccessToken(userId: string, role: string): string {
+  return jwt.sign({ sub: userId, role }, JWT_SECRET, { expiresIn: ACCESS_EXPIRES_SECS });
+}
+
+function signRefreshToken(userId: string): string {
+  return jwt.sign({ sub: userId, type: "refresh" }, JWT_REFRESH_SECRET, { expiresIn: REFRESH_EXPIRES_SECS });
+}
+
+/** Stores the refresh token in an httpOnly cookie — invisible to JavaScript */
+function setRefreshCookie(res: any, token: string) {
+  res.cookie("refresh_token", token, {
+    httpOnly: true,                                        // JS cannot read this
+    secure: process.env.NODE_ENV === "production",         // HTTPS only in prod
+    sameSite: "lax",                                       // CSRF protection
+    maxAge: REFRESH_EXPIRES_SECS * 1000,
+    path: "/api/auth",                                     // Only sent on auth routes
   });
 }
 
-// Helpers for trust score calculation
+function clearRefreshCookie(res: any) {
+  res.clearCookie("refresh_token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/api/auth",
+  });
+}
+
+/** Consistent user shape returned in all auth responses */
+function userPayload(u: { id: string; name: string; email: string; role: string; plan: string }) {
+  return { id: u.id, name: u.name, email: u.email, role: u.role, plan: u.plan };
+}
+
+/** Standard auth success response shape */
+function authResponse(user: ReturnType<typeof userPayload>, accessToken: string) {
+  return {
+    accessToken,                     // Store in JS memory (React context/state)
+    expiresIn: ACCESS_EXPIRES_SECS,  // Seconds until accessToken expires (900)
+    tokenType: "Bearer",
+    user,
+  };
+}
+
+// ── Trust score helpers ────────────────────────────────────────────────────
+
 function calcTrustScore(components: {
   schoolEmailVerified: boolean; parentVerified: boolean; phoneVerified: boolean;
   accountAgeDays: number; noFlagsBonus: boolean; tier2Flags: number; tier3Flags: number;
@@ -59,6 +98,9 @@ function deriveVerificationTier(schoolEmailVerified: boolean, parentVerified: bo
 /* ─────────────────────────────────────────────────────────
    POST /api/auth/register
    Comprehensive primary signup + safety profile registration
+   ─────────────────────────────────────────────────────────
+   Response: { accessToken, expiresIn, tokenType, user }
+   Cookie:   refresh_token (httpOnly, path=/api/auth)
    ───────────────────────────────────────────────────────── */
 router.post("/register", async (req, res): Promise<void> => {
   const {
@@ -68,9 +110,6 @@ router.post("/register", async (req, res): Promise<void> => {
     parentName, parentEmail, parentPhone,
     noParentContact, counselorEmail
   } = req.body;
-
-
-  
 
   if (!name || !email || !password) {
     res.status(400).json({ error: "Name, email, and password are required" });
@@ -165,9 +204,7 @@ router.post("/register", async (req, res): Promise<void> => {
         const tokenExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
         await tx.insert(parentAccountsTable).values({
-          id: parentId,
-          studentId,
-          userId: userId,
+          id: parentId, studentId, userId,
           name: parentName as string,
           email: (parentEmail as string).toLowerCase().trim(),
           phone: parentPhone as string | undefined,
@@ -196,15 +233,13 @@ router.post("/register", async (req, res): Promise<void> => {
       });
     });
 
-    setAuthCookie(res, userId);
+    const user         = userPayload({ id: userId, name: name.trim(), email: normEmail, role: "student", plan: "free" });
+    const accessToken  = signAccessToken(userId, "student");
+    const refreshToken = signRefreshToken(userId);
 
-    res.status(201).json({
-      id: userId,
-      name: name.trim(),
-      email: normEmail,
-      role: "student",
-      plan: "free",
-    });
+    setRefreshCookie(res, refreshToken);
+    res.status(201).json(authResponse(user, accessToken));
+
   } catch (err) {
     console.error("[register] Transaction failed:", err);
     res.status(500).json({ error: "Registration failed. Please try again." });
@@ -213,6 +248,9 @@ router.post("/register", async (req, res): Promise<void> => {
 
 /* ─────────────────────────────────────────────────────────
    POST /api/auth/login
+   ─────────────────────────────────────────────────────────
+   Response: { accessToken, expiresIn, tokenType, user }
+   Cookie:   refresh_token (httpOnly, path=/api/auth)
    ───────────────────────────────────────────────────────── */
 router.post("/login", async (req, res): Promise<void> => {
   const { email, password } = req.body;
@@ -225,58 +263,86 @@ router.post("/login", async (req, res): Promise<void> => {
   const normEmail = email.toLowerCase().trim();
 
   try {
-    const users = await db.select().from(usersTable).where(eq(usersTable.email, normEmail)).limit(1);
-    console.log({user: users[0], normEmail})
-    if (!users[0]) {
-      res.status(401).json({ error: "Invalid email or password" });
-      return;
-    }
-    
+    const rows   = await db.select().from(usersTable).where(eq(usersTable.email, normEmail)).limit(1);
+    const dbUser = rows[0];
 
-    // const isCorrectPassword: boolean = await bcrypt.compare(payload.password, userData.password);
+    // Always run bcrypt even if user not found → prevents timing attacks
+    const dummyHash = "$2a$12$invalidhashusedfortimingnormalizationonly......";
+    const isValid = dbUser
+      ? await bcrypt.compare(password, dbUser.passwordHash)
+      : await bcrypt.compare(password, dummyHash).then(() => false);
 
-    // if (!isCorrectPassword) {
-    //     throw new Error("Password incorrect!")
-    // }
-
-    const isValid: boolean = await bcrypt.compare(password, users[0].passwordHash);
-    if (!isValid) {
+    if (!dbUser || !isValid) {
       res.status(401).json({ error: "Invalid email or password" });
       return;
     }
 
-    setAuthCookie(res, users[0].id);
+    const user         = userPayload(dbUser);
+    const accessToken  = signAccessToken(dbUser.id, dbUser.role);
+    const refreshToken = signRefreshToken(dbUser.id);
 
-    res.json({
-      id: users[0].id,
-      name: users[0].name,
-      email: users[0].email,
-      role: users[0].role,
-      plan: users[0].plan,
-    });
+    setRefreshCookie(res, refreshToken);
+    res.json(authResponse(user, accessToken));
+
   } catch (err) {
+    console.error("[login] Failed:", err);
     res.status(500).json({ error: "Login failed. Please try again." });
   }
 });
 
 /* ─────────────────────────────────────────────────────────
+   POST /api/auth/refresh
+   Silently called by frontend when accessToken expires.
+   Reads httpOnly refresh_token cookie → returns new accessToken.
+   ─────────────────────────────────────────────────────────
+   Response: { accessToken, expiresIn, tokenType }
+   ───────────────────────────────────────────────────────── */
+router.post("/refresh", async (req, res): Promise<void> => {
+  const token = req.cookies?.refresh_token;
+  if (!token) {
+    res.status(401).json({ error: "No refresh token" });
+    return;
+  }
+
+  try {
+    const payload = jwt.verify(token, JWT_REFRESH_SECRET) as { sub: string; type: string };
+    if (payload.type !== "refresh") throw new Error("Not a refresh token");
+
+    const rows = await db.select().from(usersTable).where(eq(usersTable.id, payload.sub)).limit(1);
+    if (!rows[0]) {
+      res.status(401).json({ error: "User not found" });
+      return;
+    }
+
+    const newAccessToken = signAccessToken(rows[0].id, rows[0].role);
+    res.json({ accessToken: newAccessToken, expiresIn: ACCESS_EXPIRES_SECS, tokenType: "Bearer" });
+
+  } catch (err) {
+    clearRefreshCookie(res);
+    res.status(401).json({ error: "Refresh token expired or invalid. Please log in again." });
+  }
+});
+
+/* ─────────────────────────────────────────────────────────
    POST /api/auth/logout
+   Clears the httpOnly refresh_token cookie.
    ───────────────────────────────────────────────────────── */
 router.post("/logout", (req, res) => {
-  res.clearCookie("auth_token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-  });
+  clearRefreshCookie(res);
   res.json({ ok: true });
 });
 
 /* ─────────────────────────────────────────────────────────
    GET /api/auth/me
-   Fetch active session details
+   Reads Bearer accessToken from Authorization header.
+   ─────────────────────────────────────────────────────────
+   Header: Authorization: Bearer <accessToken>
+   Response: { user }
    ───────────────────────────────────────────────────────── */
 router.get("/me", async (req, res): Promise<void> => {
-  const token = req.cookies?.auth_token;
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
   if (!token) {
     res.status(401).json({ error: "Not authenticated" });
     return;
@@ -284,23 +350,17 @@ router.get("/me", async (req, res): Promise<void> => {
 
   try {
     const payload = jwt.verify(token, JWT_SECRET) as { sub: string };
-    const users = await db.select().from(usersTable).where(eq(usersTable.id, payload.sub)).limit(1);
+    const rows = await db.select().from(usersTable).where(eq(usersTable.id, payload.sub)).limit(1);
 
-    if (!users[0]) {
-      res.status(401).json({ error: "User session not found" });
+    if (!rows[0]) {
+      res.status(401).json({ error: "User not found" });
       return;
     }
 
-    res.json({
-      id: users[0].id,
-      name: users[0].name,
-      email: users[0].email,
-      role: users[0].role,
-      plan: users[0].plan,
-    });
+    res.json({ user: userPayload(rows[0]) });
+
   } catch (err) {
-    res.clearCookie("auth_token");
-    res.status(401).json({ error: "Session expired or invalid" });
+    res.status(401).json({ error: "Access token expired or invalid" });
   }
 });
 
