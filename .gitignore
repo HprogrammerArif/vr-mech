@@ -49,9 +49,9 @@ Thumbs.db
 .local/
 
 # Environment variables — NEVER commit these (contain secrets/API keys)
-.env
-.env.*
-!.env.example
+# .env
+# .env.*
+# !.env.example
 
 # Uploaded video files
 artifacts/api-server/uploads/
