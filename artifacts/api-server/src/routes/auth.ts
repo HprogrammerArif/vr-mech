@@ -174,7 +174,7 @@ router.post("/register", async (req, res): Promise<void> => {
         challengesCorrect: 0,
       });
 
-      // 3. Create Safety Account
+      // 3. Create Safety Account // student
       await tx.insert(safetyAccountsTable).values({
         id: studentId,
         learnerId: userId,

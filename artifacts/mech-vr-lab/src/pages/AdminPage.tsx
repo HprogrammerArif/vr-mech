@@ -12,13 +12,11 @@ import { VIDEO_PLAYLISTS } from "@/lib/videoData";
 import { EXPERT_TALKS, UPCOMING_LIVESTREAMS } from "@/lib/talksData";
 import { FEED_CATEGORIES, type FeedCategory } from "@/lib/feedArticles";
 import { POOL_INTERNAL, EXTERNAL_ARTICLES, getAllFeedItems } from "@/lib/feedDailyArticles";
-import { getAllAccounts, deleteAccount, updateAccount, type Account } from "@/lib/auth";
+import { getAllAccounts, deleteAccount, updateAccount, type Account, verifyAccount, authFetch, signIn, fetchCurrentSession, signOut } from "@/lib/auth";
 
 const BASE = import.meta.env.BASE_URL ?? "/";
-const SETTINGS_KEY     = "1waymirror_admin_settings_v1";
-const ADMIN_PIN        = "1WAY2026"; // used only in API request headers, not for UI login
-const ADMIN_EMAIL      = "one.waymirror@outlook.com";
-const ADMIN_PASSWORD   = "Shipnot2020!";
+const SETTINGS_KEY = "1waymirror_admin_settings_v1";
+const ADMIN_PIN        = "1WAY2026";
 
 /* ── Types ───────────────────────────────────────────────────── */
 type AdminTab = "overview" | "feed" | "videos" | "talks" | "users" | "dario" | "leads" | "safety" | "settings";
@@ -908,8 +906,17 @@ export default function AdminPage() {
   const [adminEmail, setAdminEmail]       = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [authed, setAuthed]               = useState(false);
-  const [loginError, setLoginError]       = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false); // true once restore attempt completes
+  const [loginError, setLoginError]       = useState<string | null>(null);
+  const [loginLoading, setLoginLoading]   = useState(false);
   const [showPw, setShowPw]               = useState(false);
+
+  // On mount: silently try to restore session from httpOnly refresh cookie
+  useEffect(() => {
+    fetchCurrentSession().then(user => {
+      if (user?.role === "admin") setAuthed(true);
+    }).finally(() => setSessionChecked(true));
+  }, []);
 
   /* layout */
   const [activeTab, setActiveTab]   = useState<AdminTab>("overview");
@@ -936,7 +943,7 @@ export default function AdminPage() {
   const loadDarioLogs = useCallback(async () => {
     setDarioLoading(true);
     try {
-      const res = await fetch("/api/dario/activity", { headers: { "x-admin-pin": ADMIN_PIN } });
+      const res = await authFetch("/api/dario/activity");
       if (!res.ok) throw new Error("Unauthorized");
       const data = await res.json() as { logs: DarioLog[] };
       setDarioLogs(data.logs);
@@ -993,13 +1000,34 @@ export default function AdminPage() {
   const refreshAccounts = () => setLiveAccounts(getAllAccounts());
 
   /* ── LOGIN GATE ─────────────────────────────────────── */
-  const handleLogin = () => {
-    if (adminEmail.trim().toLowerCase() === ADMIN_EMAIL && adminPassword === ADMIN_PASSWORD) {
-      setAuthed(true); setLoginError(false);
-    } else {
-      setLoginError(true); setTimeout(() => setLoginError(false), 2500);
+  const handleLogin = async () => {
+    if (!adminEmail.trim() || !adminPassword) return;
+    setLoginLoading(true);
+    setLoginError(null);
+    try {
+      const user = await verifyAccount(adminEmail.trim(), adminPassword);
+      if (!user) {
+        setLoginError("Invalid email or password.");
+        setTimeout(() => setLoginError(null), 3000);
+        return;
+      }
+      if (user.role !== "admin") {
+        setLoginError("Access denied. Admin privileges required.");
+        setTimeout(() => setLoginError(null), 3000);
+        return;
+      }
+      signIn(user);
+      setAuthed(true);
+    } catch {
+      setLoginError("Unable to connect. Please try again.");
+      setTimeout(() => setLoginError(null), 3000);
+    } finally {
+      setLoginLoading(false);
     }
   };
+
+  // Show nothing while checking refresh cookie (avoids login flash on reload)
+  if (!sessionChecked) return null;
 
   if (!authed) {
     return (
@@ -1044,11 +1072,11 @@ export default function AdminPage() {
                 </button>
               </div>
             </div>
-            {loginError && <div className="flex items-center gap-2 text-xs text-red-400"><AlertCircle className="h-3.5 w-3.5" /> Incorrect email or password.</div>}
-            <button onClick={handleLogin}
-              className="w-full py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02]"
+            {loginError && <div className="flex items-center gap-2 text-xs text-red-400"><AlertCircle className="h-3.5 w-3.5" /> {loginError}</div>}
+            <button onClick={handleLogin} disabled={loginLoading}
+              className="w-full py-3 rounded-xl text-sm font-black transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ background:"linear-gradient(135deg,#f5a524,#ea580c)", color:"#0a1428" }}>
-              <Shield className="h-4 w-4 inline mr-2" />Enter Admin Panel
+              <Shield className="h-4 w-4 inline mr-2" />{loginLoading ? "Verifying…" : "Enter Admin Panel"}
             </button>
             <Link href="/"><button className="w-full mt-1 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-300 transition-colors">← Back to Home</button></Link>
           </div>
@@ -1146,8 +1174,14 @@ export default function AdminPage() {
           <Link href="/"><button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors">
             <Home className="h-4 w-4 flex-shrink-0" />{sidebarOpen && "Home Page"}
           </button></Link>
-          <button onClick={() => setAuthed(false)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-red-400 hover:bg-red-900/10 transition-colors">
+          <button
+              onClick={async () => {
+                signOut(); // clears access token + calls POST /api/auth/logout (clears httpOnly cookie)
+                setAuthed(false);
+                setSessionChecked(false); // reset so next mount check starts fresh
+                setSessionChecked(true);
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-red-400 hover:bg-red-900/10 transition-colors">
             <LogOut className="h-4 w-4 flex-shrink-0" />{sidebarOpen && "Sign Out"}
           </button>
         </div>
